@@ -1,0 +1,2785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Manual Completo: Creación de Vídeos Virales de Animación (Monigotes / Stickman) con IA Gratuita — V001</title>
+<style>
+  :root {
+    --bg-main: #0a0e1a;
+    --bg-card: #0f172a;
+    --bg-elevated: #162238;
+    --blue-highlight: #1e3a5f;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-cyan: #00d4ff;
+    --accent-purple: #a855f7;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --border-color: #1e3a5f;
+    --font-scale: 1;
+  }
+
+  body.light-theme {
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-elevated: #e2e8f0;
+    --blue-highlight: #cbd5e1;
+    --text-main: #0f172a;
+    --text-muted: #334155;
+    --accent: #0284c7;
+    --accent-cyan: #0369a1;
+    --border-color: #94a3b8;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: calc(16px * var(--font-scale));
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    padding-top: 112px;
+    padding-bottom: 84px;
+  }
+
+  /* BARRA DE PROGRESO DE LECTURA */
+  #reading-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-green));
+    z-index: 60;
+    transition: width 0.15s ease-out;
+  }
+
+  /* BARRA DE NAVEGACIÓN SUPERIOR FIJA */
+  .top-fixed-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 58px;
+    background: rgba(15, 23, 42, 0.96);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    z-index: 40;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+
+  body.light-theme .top-fixed-nav {
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-elevated);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    user-select: none;
+  }
+
+  .chip:hover,
+  .chip:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .chip.active-chip {
+    background: #00d4ff22;
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  /* PANEL LATERAL DE ÍNDICE (#dr) */
+  #dr {
+    position: fixed;
+    top: 58px;
+    left: 0;
+    bottom: 0;
+    width: min(330px, 88vw);
+    background: #0f172a;
+    border-right: 1px solid #1e3a5f;
+    transform: translateX(-105%);
+    transition: .25s;
+    z-index: 45;
+    overflow: auto;
+    padding: 10px;
+  }
+
+  #dr.o {
+    transform: none;
+  }
+
+  #dr a {
+    display: block;
+    padding: 12px;
+    border-radius: 8px;
+    color: #e2e8f0;
+    cursor: pointer;
+    min-height: 44px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+    margin-bottom: 4px;
+  }
+
+  #dr a:hover {
+    background: #ffffff0d;
+  }
+
+  #dr a.on {
+    background: #00d4ff22;
+    color: #00d4ff;
+  }
+
+  /* BARRA SECUNDARIA DE HERRAMIENTAS (BUSCADOR, FUENTE, TEMA, PDF) */
+  .utility-bar {
+    position: fixed;
+    top: 58px;
+    left: 0;
+    right: 0;
+    min-height: 48px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 4px 8px;
+    z-index: 30;
+    flex-wrap: nowrap;
+  }
+
+  .search-wrapper {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 110px;
+    max-width: 360px;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-wrapper input {
+    width: 100%;
+    min-height: 38px;
+    padding: 6px 28px 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 0.85rem;
+  }
+
+  #clear-search {
+    position: absolute;
+    right: 6px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    display: none;
+    padding: 4px;
+  }
+
+  .utility-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .util-btn {
+    min-height: 38px;
+    min-width: 38px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-elevated);
+    color: var(--text-main);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* CONTENEDOR PRINCIPAL OPTIMIZADO PARA 360PX (SAMSUNG GALAXY A02S) */
+  .tutorial-container {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 12px 10px;
+  }
+
+  .tab-section {
+    display: none;
+    animation: fadeInTab 0.22s ease-out;
+  }
+
+  .tab-section.active-section {
+    display: block;
+  }
+
+  @keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* TIPOGRAFÍA Y TARJETAS */
+  h1 {
+    font-size: 1.45rem;
+    line-height: 1.3;
+    color: var(--text-main);
+    margin: 12px 0 8px;
+  }
+
+  .section-main-title {
+    font-size: 1.25rem;
+    color: var(--accent);
+    margin: 10px 0 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  h3 {
+    font-size: 1.08rem;
+    color: var(--accent-cyan);
+    margin-bottom: 10px;
+  }
+
+  h4 {
+    font-size: 0.98rem;
+    color: var(--text-main);
+    margin: 8px 0 4px;
+  }
+
+  p {
+    margin-bottom: 10px;
+    overflow-wrap: anywhere;
+  }
+
+  ul, ol {
+    margin: 8px 0 12px 20px;
+  }
+
+  li {
+    margin-bottom: 6px;
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    background: rgba(56, 189, 248, 0.14);
+    color: var(--accent);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.88em;
+    word-break: break-word;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 14px 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+  }
+
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    color: var(--accent);
+  }
+
+  .badge.level-1 { border-color: var(--accent-green); color: var(--accent-green); }
+  .badge.level-2 { border-color: var(--accent-amber); color: var(--accent-amber); }
+  .badge.level-3 { border-color: var(--accent-purple); color: #d8b4fe; }
+
+  .pedagogy-grid,
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  @media (min-width: 640px) {
+    .pedagogy-grid { grid-template-columns: repeat(3, 1fr); }
+    .compare-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .pedagogy-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .pedagogy-box strong {
+    display: block;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .box-wrong {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--accent-red);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .box-right {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid var(--accent-green);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  /* PASOS NUMERADOS */
+  .step-card {
+    background: var(--bg-elevated);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #0a0e1a;
+    font-weight: 800;
+    font-size: 0.88rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-meta {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    background: rgba(15, 23, 42, 0.45);
+    padding: 8px;
+    border-radius: 8px;
+    margin-top: 6px;
+  }
+
+  /* BLOQUES DE CÓDIGO Y PROMPTS CON BOTÓN COPIAR */
+  .code-container {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0 14px;
+    background: #070b14;
+  }
+
+  .code-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #111c33;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #cbd5e1;
+  }
+
+  .copy-btn {
+    min-height: 36px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--accent-cyan);
+    background: rgba(0, 212, 255, 0.15);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.78rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  pre.code-block {
+    padding: 12px;
+    color: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+  }
+
+  /* TABLAS ADAPTABLES SIN DESBORDE EN 360PX */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+  }
+
+  th, td {
+    padding: 9px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--blue-highlight);
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  /* ACORDEONES Q&A Y EJERCICIOS */
+  details.qa-item {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  details.qa-item summary {
+    padding: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+  }
+
+  details.qa-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .qa-body {
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-card);
+  }
+
+  /* CHECKLIST INTERACTIVO */
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-elevated);
+    margin-bottom: 8px;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .checklist-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--accent-green);
+    flex-shrink: 0;
+  }
+
+  .checklist-item.checked span {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  /* SVG HERO & CRÉDITOS EN FORMATO 4:5 VERTICAL */
+  .svg-hero-wrapper {
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 4 / 5;
+    margin: 4px auto 10px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: #070b14;
+    box-shadow: 0 10px 28px rgba(0, 212, 255, 0.14);
+  }
+
+  .svg-mount-node,
+  .svg-mount-node svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .svg-controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  /* ANIMACIONES VECTORIALES DEL SVG */
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.65; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.12); }
+  }
+
+  @keyframes dashFlow {
+    to { stroke-dashoffset: -48; }
+  }
+
+  @keyframes floatNode {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes stickArmWave {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-14deg); }
+  }
+
+  @keyframes playheadScan {
+    0%, 100% { transform: translateX(0px); }
+    50% { transform: translateX(175px); }
+  }
+
+  @keyframes soundWaveBar {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1.15); }
+  }
+
+  .anim-pulse { animation: pulseGlow 2.4s infinite ease-in-out; transform-box: fill-box; transform-origin: center; }
+  .anim-dash { stroke-dasharray: 6 6; animation: dashFlow 1.8s infinite linear; }
+  .anim-stick-arm { animation: stickArmWave 2.2s infinite ease-in-out; transform-origin: 0px -4px; }
+  .anim-playhead { animation: playheadScan 5.5s infinite ease-in-out; }
+  .anim-wave-1 { animation: soundWaveBar 0.9s infinite ease-in-out; transform-box: fill-box; transform-origin: center; }
+  .anim-wave-2 { animation: soundWaveBar 1.2s infinite ease-in-out; transform-box: fill-box; transform-origin: center; }
+  .anim-wave-3 { animation: soundWaveBar 0.75s infinite ease-in-out; transform-box: fill-box; transform-origin: center; }
+
+  .svg-paused *,
+  .svg-paused {
+    animation-play-state: paused !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anim-pulse, .anim-dash, .anim-stick-arm, .anim-playhead, .anim-wave-1, .anim-wave-2, .anim-wave-3 {
+      animation: none !important;
+    }
+  }
+
+  /* AUTOR DESTACADO EN CRÉDITOS */
+  .author-spotlight {
+    font-size: 2rem;
+    font-weight: 900;
+    text-align: center;
+    color: var(--accent-cyan);
+    margin: 14px 0 4px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 18px rgba(0, 212, 255, 0.35);
+  }
+
+  .author-role {
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 10px;
+  }
+
+  /* BOTONES DE NAVEGACIÓN AL FINAL DE CADA PESTAÑA */
+  .tab-footer-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    position: sticky;
+    bottom: 8px;
+    z-index: 20;
+  }
+
+  .nav-step-btn {
+    flex: 1 1 auto;
+    min-height: 44px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-elevated);
+    color: var(--text-main);
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .nav-step-btn.next-btn {
+    background: linear-gradient(135deg, #0284c7, #00d4ff);
+    color: #06101e;
+    border-color: var(--accent-cyan);
+  }
+
+  /* BOTONES FLOTANTES ARRASTRABLES (INICIO Y ARRIBA) */
+  .floating-draggable-btn {
+    position: fixed;
+    z-index: 50;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-cyan);
+    background: rgba(15, 23, 42, 0.92);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  .floating-draggable-btn:active {
+    cursor: grabbing;
+  }
+
+  .floating-draggable-btn .icon {
+    font-size: 1.05rem;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  #fab-home {
+    right: 10px;
+    bottom: 136px;
+  }
+
+  #fab-top {
+    right: 10px;
+    bottom: 74px;
+  }
+
+  /* NOTIFICACIÓN TOAST */
+  #toast-msg {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #0f172a;
+    color: #38bdf8;
+    border: 1px solid #38bdf8;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 80;
+    max-width: 92vw;
+    text-align: center;
+  }
+
+  #toast-msg.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* HOJA DE ESTILOS DE IMPRESIÓN Y EXPORTACIÓN PDF A4 */
+  @page {
+    size: A4 portrait;
+    margin: 14mm 12mm;
+  }
+
+  @media print {
+    body {
+      background: #ffffff !important;
+      color: #000000 !important;
+      padding: 0 !important;
+      font-size: 11pt !important;
+    }
+    .top-fixed-nav,
+    #dr,
+    .utility-bar,
+    .svg-controls-bar,
+    .tab-footer-nav,
+    .floating-draggable-btn,
+    .copy-btn,
+    #btn-reset-checklist,
+    #reading-progress-bar,
+    #toast-msg {
+      display: none !important;
+    }
+    .tab-section {
+      display: block !important;
+      margin-bottom: 18px !important;
+    }
+    .card, .step-card, .pedagogy-box, details.qa-item, .qa-body, .code-container, pre.code-block {
+      background: #ffffff !important;
+      color: #000000 !important;
+      border-color: #666666 !important;
+      box-shadow: none !important;
+    }
+    h1, h2, h3, h4, .author-spotlight, .author-role, code {
+      color: #000000 !important;
+      text-shadow: none !important;
+    }
+    .svg-hero-wrapper {
+      max-width: 240px !important;
+      border: 1px solid #000000 !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="reading-progress-bar" aria-hidden="true"></div>
+
+<!-- BARRA DE NAVEGACIÓN SUPERIOR FIJA CON BOTÓN ☰ ÍNDICE Y PESTAÑAS -->
+<nav class="top-fixed-nav" aria-label="Navegación principal del tutorial">
+  <button class="chip" id="mb" aria-label="Abrir índice" aria-expanded="false">☰ Índice</button>
+  <button type="button" class="chip nav-tab-chip active-chip" data-index="0">INICIO</button>
+  <button type="button" class="chip nav-tab-chip" data-index="1">CONCEPTOS</button>
+  <button type="button" class="chip nav-tab-chip" data-index="2">PROCEDIMIENTO</button>
+  <button type="button" class="chip nav-tab-chip" data-index="3">PRÁCTICA</button>
+  <button type="button" class="chip nav-tab-chip" data-index="4">PROMPTS</button>
+  <button type="button" class="chip nav-tab-chip" data-index="5">33 Preguntas (Q&amp;A)</button>
+  <button type="button" class="chip nav-tab-chip" data-index="6">ERRORES</button>
+  <button type="button" class="chip nav-tab-chip" data-index="7">RESUMEN</button>
+  <button type="button" class="chip nav-tab-chip" data-index="8">FUENTES</button>
+  <button type="button" class="chip nav-tab-chip" data-index="9">CRÉDITOS</button>
+</nav>
+<div id="dr" aria-label="Panel lateral de índice de secciones"></div>
+
+<!-- BARRA SECUNDARIA DE HERRAMIENTAS INTERACTIVAS -->
+<header class="utility-bar" aria-label="Herramientas de lectura y accesibilidad">
+  <div class="search-wrapper">
+    <input type="search" id="global-search" placeholder="Buscar en el tutorial..." aria-label="Buscar término en el tutorial">
+    <button type="button" id="clear-search" aria-label="Limpiar búsqueda">✕</button>
+  </div>
+  <div class="utility-actions">
+    <button type="button" class="util-btn" id="btn-font-down" title="Reducir tamaño de letra" aria-label="Reducir tamaño de letra">A−</button>
+    <button type="button" class="util-btn" id="btn-font-up" title="Aumentar tamaño de letra" aria-label="Aumentar tamaño de letra">A+</button>
+    <button type="button" class="util-btn" id="btn-theme" title="Cambiar entre tema oscuro y claro" aria-label="Cambiar tema visual">☀/🌙</button>
+    <button type="button" class="util-btn" id="btn-print" title="Imprimir o guardar como PDF A4" aria-label="Imprimir o guardar PDF">🖨 PDF</button>
+  </div>
+</header>
+
+<!-- FUENTE ÚNICA OCULTA DEL SVG ANIMADO (SE EXTRAE Y ELIMINA DEL DOM AL INICIAR) -->
+<svg id="master-svg-source" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <defs>
+    <linearGradient id="bgGrad__UID__" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060b16"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#091526"/>
+    </linearGradient>
+    <linearGradient id="cyanGlow__UID__" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="neonFilter__UID__" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00d4ff" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- CAPA 1: FONDO TECNOLÓGICO Y REJILLA DE ESTUDIO DE ANIMACIÓN -->
+  <rect width="400" height="500" fill="url(#bgGrad__UID__)"/>
+  <g stroke="#1e3a5f" stroke-width="0.6" opacity="0.45">
+    <line x1="0" y1="60" x2="400" y2="60"/>
+    <line x1="0" y1="120" x2="400" y2="120"/>
+    <line x1="0" y1="180" x2="400" y2="180"/>
+    <line x1="0" y1="240" x2="400" y2="240"/>
+    <line x1="0" y1="300" x2="400" y2="300"/>
+    <line x1="0" y1="360" x2="400" y2="360"/>
+    <line x1="80" y1="0" x2="80" y2="500"/>
+    <line x1="160" y1="0" x2="160" y2="500"/>
+    <line x1="240" y1="0" x2="240" y2="500"/>
+    <line x1="320" y1="0" x2="320" y2="500"/>
+  </g>
+
+  <!-- CAPA 2: CABECERA DEL ESTUDIO IA Y HALO DE ENERGÍA CENTRAL -->
+  <rect x="20" y="10" width="360" height="24" rx="6" fill="#0f172a" stroke="#1e3a5f" stroke-width="1.2"/>
+  <text x="200" y="26" text-anchor="middle" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="10" font-weight="800">ESTUDIO VIRAL STICKMAN IA — FLUJO 100% GRATUITO</text>
+  <circle cx="200" cy="208" r="108" fill="none" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <circle cx="200" cy="208" r="88" fill="#00d4ff" opacity="0.05" class="anim-pulse"/>
+
+  <!-- CAPA 3: LÍNEAS DE FLUJO DE DATOS CONECTANDO LAS 4 HERRAMIENTAS AL STICKMAN -->
+  <path class="anim-dash" d="M 75 82 Q 130 140 165 170" fill="none" stroke="#00d4ff" stroke-width="2.2"/>
+  <path class="anim-dash" d="M 325 82 Q 270 140 235 170" fill="none" stroke="#a855f7" stroke-width="2.2"/>
+  <path class="anim-dash" d="M 75 335 Q 135 280 168 255" fill="none" stroke="#22c55e" stroke-width="2.2"/>
+  <path class="anim-dash" d="M 325 335 Q 265 280 232 255" fill="none" stroke="#f59e0b" stroke-width="2.2"/>
+
+  <!-- CAPA 4: NODOS DE LAS 4 PLATAFORMAS IA GRATUITAS -->
+  <!-- Nodo 1: Gemini (Guion y Prompts) -->
+  <g class="anim-float" transform="translate(22, 42)">
+    <rect width="108" height="44" rx="10" fill="#0f172a" stroke="#00d4ff" stroke-width="1.8"/>
+    <circle cx="20" cy="22" r="8" fill="#00d4ff" class="anim-pulse"/>
+    <text x="34" y="19" fill="#ffffff" font-family="system-ui, sans-serif" font-size="10" font-weight="800">GEMINI IA</text>
+    <text x="34" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="8.5">Prompts 1, 2 y 3</text>
+  </g>
+
+  <!-- Nodo 2: Google Flow (Nano Banana Pro + OVNI 11) -->
+  <g class="anim-float" transform="translate(270, 42)">
+    <rect width="108" height="44" rx="10" fill="#0f172a" stroke="#a855f7" stroke-width="1.8"/>
+    <circle cx="20" cy="22" r="8" fill="#a855f7" class="anim-pulse"/>
+    <text x="34" y="19" fill="#ffffff" font-family="system-ui, sans-serif" font-size="10" font-weight="800">GOOGLE FLOW</text>
+    <text x="34" y="32" fill="#c084fc" font-family="system-ui, sans-serif" font-size="8.5">OVNI 11 Flash</text>
+  </g>
+
+  <!-- Nodo 3: Luvvoice / Loop Boys (TTS MP3) -->
+  <g class="anim-float" transform="translate(22, 315)">
+    <rect width="108" height="44" rx="10" fill="#0f172a" stroke="#22c55e" stroke-width="1.8"/>
+    <g transform="translate(13, 12)" fill="#22c55e">
+      <rect class="anim-wave-1" x="0" y="2" width="3" height="16" rx="1"/>
+      <rect class="anim-wave-2" x="5" y="0" width="3" height="20" rx="1"/>
+      <rect class="anim-wave-3" x="10" y="4" width="3" height="12" rx="1"/>
+    </g>
+    <text x="34" y="19" fill="#ffffff" font-family="system-ui, sans-serif" font-size="10" font-weight="800">LUVVOICE</text>
+    <text x="34" y="32" fill="#86efac" font-family="system-ui, sans-serif" font-size="8.5">Voz TTS MP3</text>
+  </g>
+
+  <!-- Nodo 4: Kimi K31 & CapCut (Montaje) -->
+  <g class="anim-float" transform="translate(270, 315)">
+    <rect width="108" height="44" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="1.8"/>
+    <circle cx="20" cy="22" r="8" fill="#f59e0b" class="anim-pulse"/>
+    <text x="34" y="19" fill="#ffffff" font-family="system-ui, sans-serif" font-size="10" font-weight="800">CAPCUT + KIMI</text>
+    <text x="34" y="32" fill="#fcd34d" font-family="system-ui, sans-serif" font-size="8.5">Sync &amp; K31 3D</text>
+  </g>
+
+  <!-- CAPA 5: ELEMENTO CENTRAL PROTAGONISTA - HOJA DE PERSONAJE (CHARACTER SHEET) Y MONIGOTE ANIMADO -->
+  <g transform="translate(115, 110)">
+    <!-- Marco Character Sheet 1K -->
+    <rect width="170" height="195" rx="14" fill="#0b1324" stroke="url(#cyanGlow__UID__)" stroke-width="2.5" filter="url(#neonFilter__UID__)"/>
+    <rect x="8" y="8" width="154" height="22" rx="6" fill="#1e3a5f"/>
+    <text x="85" y="23" text-anchor="middle" fill="#00d4ff" font-family="system-ui, sans-serif" font-size="9.5" font-weight="800">CHARACTER SHEET @[1K]</text>
+
+    <!-- Monigote / Stickman Protagonista (Piteas / Explorador Viral) -->
+    <g transform="translate(85, 92)">
+      <!-- Cabeza del Monigote -->
+      <circle cx="0" cy="-32" r="18" fill="#0f172a" stroke="#ffffff" stroke-width="3.5"/>
+      <!-- Ojos expresivos -->
+      <circle cx="-6" cy="-34" r="2.3" fill="#00d4ff"/>
+      <circle cx="6" cy="-34" r="2.3" fill="#00d4ff"/>
+      <!-- Sonrisa / expresión narrativa -->
+      <path d="M -6 -26 Q 0 -21 6 -26" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <!-- Capa / Sombrero de explorador sutil -->
+      <path d="M -20 -42 Q 0 -55 20 -42" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+      <!-- Torso Stickman -->
+      <line x1="0" y1="-14" x2="0" y2="34" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+      <!-- Brazo izquierdo sosteniendo mapa/pergamino -->
+      <path d="M 0 -4 L -26 12 L -18 24" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Brazo derecho animado dibujando / dirigiendo escena -->
+      <g class="anim-stick-arm">
+        <path d="M 0 -4 L 28 -16 L 38 -6" fill="none" stroke="#00d4ff" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="38" cy="-6" r="4" fill="#a855f7" class="anim-pulse"/>
+      </g>
+      <!-- Piernas del Monigote -->
+      <line x1="0" y1="34" x2="-20" y2="70" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="0" y1="34" x2="20" y2="70" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <!-- Etiqueta de consistencia @ -->
+    <rect x="18" y="168" width="134" height="19" rx="5" fill="#00d4ff22" stroke="#00d4ff" stroke-width="1"/>
+    <text x="85" y="181" text-anchor="middle" fill="#e2e8f0" font-family="monospace" font-size="8.5" font-weight="700">personaje @[planilla]</text>
+  </g>
+
+  <!-- CAPA 6: LÍNEA DE TIEMPO MULTIMEDIA INFERIOR (CAPCUT SYNC + MÉTRICAS VIRALES) -->
+  <g transform="translate(20, 382)">
+    <rect width="360" height="98" rx="12" fill="#0f172a" stroke="#1e3a5f" stroke-width="1.8"/>
+    <text x="14" y="20" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="9.5" font-weight="800">TIMELINE MULTIPROCESO — 16:9 / 720p HD</text>
+    <text x="346" y="20" text-anchor="end" fill="#22c55e" font-family="system-ui, sans-serif" font-size="9.5" font-weight="800">+17M Vistas ★</text>
+
+    <!-- Pistas de Vídeo (Escenas 1, 2, 3) -->
+    <rect x="14" y="30" width="105" height="22" rx="4" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1"/>
+    <text x="66" y="44" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700">Escena 1 (OVNI 11)</text>
+
+    <rect x="126" y="30" width="105" height="22" rx="4" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1"/>
+    <text x="178" y="44" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700">Escena 2 (OVNI 11)</text>
+
+    <rect x="238" y="30" width="108" height="22" rx="4" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1"/>
+    <text x="292" y="44" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700">Escena 3 (Batch 45cr)</text>
+
+    <!-- Pista de Audio MP3 con pausas -->
+    <rect x="14" y="58" width="332" height="26" rx="4" fill="#091526" stroke="#22c55e" stroke-width="1"/>
+    <text x="24" y="75" fill="#86efac" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700">VOZ OFF MP3 (10.000 car/mes) • Pausas 0.5s–5s • Speed Sync</text>
+
+    <!-- Cabezal de reproducción animado (Playhead) -->
+    <g class="anim-playhead">
+      <line x1="95" y1="26" x2="95" y2="88" stroke="#ef4444" stroke-width="2.5"/>
+      <polygon points="90,26 100,26 95,33" fill="#ef4444"/>
+    </g>
+  </g>
+</svg>
+
+<!-- CONTENEDOR PRINCIPAL DEL TUTORIAL -->
+<main class="tutorial-container" id="main-content">
+
+  <!-- =====================================================================
+       PESTAÑA 0: INICIO (HOME)
+       ===================================================================== -->
+  <section class="tab-section active-section" id="sec-inicio" data-t="INICIO">
+    <div class="svg-hero-wrapper" role="img" aria-label="Ilustración vectorial animada del flujo completo de creación de vídeos virales de monigotes (Stickman) con Inteligencia Artificial gratuita: conecta Google Gemini, Google Flow (modelos Nano Banana Pro y OVNI 11 Flash), Luvvoice TTS y CapCut alrededor de una Hoja de Personaje consistente a 1K.">
+      <div class="svg-mount-node" id="svg-mount-home"></div>
+    </div>
+
+    <div class="svg-controls-bar">
+      <button type="button" class="chip" id="ix" aria-label="Ver índice completo de secciones">☰ Ver índice</button>
+      <button type="button" class="chip" id="btn-toggle-svg-home" aria-label="Pausar o reanudar animación">⏸ Pausar animación</button>
+    </div>
+
+    <div class="badge-row">
+      <span class="badge level-1">Principiante a PRO</span>
+      <span class="badge">100% Herramientas Gratuitas</span>
+      <span class="badge">Metodología Rubén Sbarsky</span>
+      <span class="badge">Versión V001</span>
+    </div>
+
+    <h1>Manual Completo y Guía Técnica: Creación de Vídeos Virales de Animación (Monigotes / Stickman) con IA Gratuita</h1>
+    <h2 class="section-main-title">0. Introducción, Modelo Viral y Requisitos Previos</h2>
+
+    <div class="card">
+      <h3>0.1. ¿Qué son los vídeos de Monigotes (Stickman) y por qué son un fenómeno viral?</h3>
+      <p>Los vídeos animados basados en monigotes —conocidos internacionalmente en la industria digital como <strong>Stickman videos</strong>— constituyen una de las tendencias de mayor crecimiento, retención y rendimiento en plataformas de vídeo tanto de formato corto como de formato largo (especialmente en <strong>YouTube</strong> y <strong>TikTok</strong>).</p>
+      <p>Para dimensionar su impacto real con datos documentados en la fuente: canales de reciente creación (por ejemplo, lanzados en <strong>abril de 2026</strong>) han demostrado la capacidad de acumular más de <strong>158.000 suscriptores</strong> y superar los <strong>17 millones de visualizaciones acumuladas</strong> habiendo publicado apenas <strong>20 vídeos</strong>.</p>
+
+      <div class="pedagogy-grid">
+        <div class="pedagogy-box">
+          <strong>¿Qué es?</strong>
+          Es un formato audiovisual que combina una narración envolvente (<em>storytelling</em> documental) con ilustraciones animadas de trazos limpios y personajes simplificados pero expresivos.
+        </div>
+        <div class="pedagogy-box">
+          <strong>¿Para qué sirve?</strong>
+          Permite explicar historias antiguas, misterios científicos, casos extraños o supervivencia manteniendo la atención del espectador desde el primer segundo.
+        </div>
+        <div class="pedagogy-box">
+          <strong>¿Por qué importa?</strong>
+          Elimina las barreras técnicas tradicionales: no necesitas saber dibujar, ni usar complejos programas de animación 2D/3D, ni invertir dinero en licencias de pago.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>0.2. Requisitos Técnicos de Hardware, Software y Conexión</h3>
+      <p>Uno de los mayores beneficios de este flujo de trabajo es que <strong>no necesitas un ordenador de gama alta ni una tarjeta gráfica dedicada</strong>. Todo el procesamiento pesado de Inteligencia Artificial (tanto la generación de imágenes a 1K como el renderizado de vídeo a 720p) se ejecuta directamente en los servidores en la nube.</p>
+      <ul>
+        <li><strong>Hardware compatible:</strong> Cualquier ordenador (Windows, Mac, Linux o Chromebook) o teléfono móvil inteligente (como el Samsung Galaxy A02s o superior) con un navegador web actualizado.</li>
+        <li><strong>Conexión a Internet:</strong> Conexión estable de banda ancha o datos móviles para cargar las referencias visuales y descargar las hojas de personaje en resolución <strong>1K</strong>, los audios en <strong>MP3</strong> y los clips animados en <strong>720p</strong>.</li>
+        <li><strong>Cuentas de correo electrónico:</strong> Una o varias cuentas de Google (<strong>Gmail</strong>) gratuitas para registrarte e iniciar sesión en Google Gemini, Google Flow y Luvvoice / Loop Boys.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>0.3. Mapa Completo del Ecosistema de Herramientas Gratuitas</h3>
+      <p>A continuación se detalla cada herramienta que interviene en la cadena de producción, su función exacta y las condiciones documentadas de su plan gratuito:</p>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Herramienta</th>
+              <th>Rol en el Flujo de Trabajo</th>
+              <th>Plan Gratuito y Límites Oficiales</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Google Gemini</strong></td>
+              <td>Generación de ideas virales, redacción del guion narrativo (Prompt 1), diseño de prompts para la hoja de personaje (Prompt 2) y desglose cronológico de escenas (Prompt 3).</td>
+              <td><strong>100% Gratuito</strong> accediendo con una cuenta de Google (Gmail).</td>
+            </tr>
+            <tr>
+              <td><strong>Luvvoice / Loop Boys</strong></td>
+              <td>Síntesis de voz en off profesional (Texto a Voz / TTS) en español de España con control de velocidad, tono e inserción de pausas estratégicas.</td>
+              <td><strong>10.000 caracteres/mes gratis</strong> por cuenta registrada (y hasta 20.000 caracteres por conversión individual). Exportación directa en <strong>MP3</strong>.</td>
+            </tr>
+            <tr>
+              <td><strong>Google Flow</strong></td>
+              <td>Renderizado de la Hoja de Personaje con el modelo <strong>Nano Banana Pro</strong> (a 1K) y generación en lote de clips animados con el modelo <strong>OVNI 11 Flash</strong> (a 720p).</td>
+              <td><strong>50 puntos/créditos diarios gratuitos</strong> renovables cada 24 horas por cuenta (un lote de 3 vídeos consume 45 créditos).</td>
+            </tr>
+            <tr>
+              <td><strong>CapCut</strong></td>
+              <td>Edición en línea de tiempo, sincronización milimétrica entre audio y vídeo mediante ajuste de velocidad (<em>Speed</em>), transiciones y exportación final.</td>
+              <td><strong>Gratuito</strong> para todas las funciones estándar de montaje en versión web o de escritorio.</td>
+            </tr>
+            <tr>
+              <td><strong>Kimi (Moonshot AI K31)</strong></td>
+              <td>Herramienta avanzada complementaria para el prototipado rápido de videojuegos 3D interactivos y planificación integral de <em>storyboards</em> y rodaje para mini dramas.</td>
+              <td>Modelo gratuito <strong>K31</strong> disponible directamente desde su plataforma web oficial.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn next-btn" data-goto="1">Siguiente: 1. CONCEPTOS ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 1: CONCEPTOS Y CONFIGURACIÓN
+       ===================================================================== -->
+  <section class="tab-section" id="sec-conceptos" data-t="CONCEPTOS">
+    <h2 class="section-main-title">1. Conceptos Fundamentales, Configuración Inicial y Glosario Técnico</h2>
+
+    <div class="card">
+      <h3>1.1. Por qué los principiantes fallan al animar con IA y cómo lo resolvemos</h3>
+      <p>Cuando una persona sin experiencia intenta crear un vídeo animado pidiéndole escenas sueltas a un generador de vídeo por IA, se topa inmediatamente con el problema crítico de la <strong>inconsistencia visual</strong>: en la Escena 1 el personaje tiene una cara y una ropa, y en la Escena 2 la IA dibuja a una persona completamente distinta.</p>
+      <p>La metodología de este manual soluciona ese obstáculo de raíz aplicando tres pilares técnicos:</p>
+      <ol>
+        <li><strong>Regla del Protagonista Único:</strong> Los guiones se diseñan para girar en torno a un único personaje central (cualquier otra figura es meramente anecdótica o de fondo).</li>
+        <li><strong>Hoja de Personaje (Character Sheet / Planilla):</strong> Antes de animar un solo segundo de vídeo, generamos una lámina maestra en resolución <strong>1K</strong> que muestra a nuestro monigote en varias posturas y ángulos.</li>
+        <li><strong>Anclaje Visual por Arrastre y Etiqueta <code>@</code>:</strong> En Google Flow, arrastramos esa planilla a la barra de comandos y utilizamos el hiperenlace interno <code>personaje @[planilla]</code> para obligar al motor <strong>OVNI 11 Flash</strong> a calcar los rasgos en todas las tomas.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>1.2. Configuración Paso a Paso de las 5 Plataformas del Ecosistema</h3>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h4>Configuración de Google Gemini y Entorno de Trabajo</h4>
+        </div>
+        <p><strong>Acción:</strong> Accede a la web oficial de Google Gemini e inicia sesión con tu cuenta de Google. Abre paralelamente un bloc de notas o documento de texto limpio en tu dispositivo.</p>
+        <div class="step-meta"><strong>Motivo y resultado esperado:</strong> Separarás el trabajo en 3 conversaciones limpias e independientes (Prompt 1, Prompt 2 y Prompt 3) y tendrás un lugar seguro donde guardar el guion y los prompts desglosados sin perder datos.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h4>Configuración de Luvvoice / Loop Boys (Síntesis de Voz)</h4>
+        </div>
+        <p><strong>Acción:</strong> Entra en <code>https://luvvoice.com/es</code> e inicia sesión obligatoriamente con tu cuenta de Google.</p>
+        <div class="step-meta"><strong>Motivo y resultado esperado:</strong> Iniciar sesión activa tu cuota gratuita de <strong>10.000 caracteres al mes</strong>, amplía el límite a <strong>20.000 caracteres por conversión</strong> y desbloquea el botón de <strong>Pausas personalizadas</strong> (de 0.5s a 5s).</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h4>Configuración de Google Flow y Control de Créditos Diarios</h4>
+        </div>
+        <p><strong>Acción:</strong> Ingresa en Google Flow con tu cuenta de Google, pulsa en <strong>Nuevo Proyecto</strong> y localiza el indicador de puntos en la barra inferior.</p>
+        <div class="step-meta"><strong>Motivo y resultado esperado:</strong> Verificarás que dispones de los <strong>50 puntos o créditos diarios gratuitos</strong> que Google Flow recarga cada 24 horas por cuenta (suficientes para crear la planilla y un lote de 3 escenas que consume 45 créditos).</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">4</span>
+          <h4>Configuración de CapCut y Kimi (Moonshot AI K31)</h4>
+        </div>
+        <p><strong>Acción:</strong> Abre CapCut (en su versión web o descargando la aplicación de escritorio) para el montaje final, y regístrate en el portal web de Kimi para disponer del modelo gratuito <strong>K31</strong> en tareas de prototipado y <em>storyboards</em>.</p>
+        <div class="step-meta"><strong>Motivo y resultado esperado:</strong> Tendrás listo el banco de montaje para sincronizar audio MP3 con vídeo 720p y el asistente K31 para proyectos de mini dramas o juegos 3D.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>1.3. Glosario Completo de Términos Técnicos para Principiantes</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Término Técnico</th>
+              <th>Definición Clara y Aplicación en el Tutorial</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Monigote (Stickman)</strong></td>
+              <td>Estilo de ilustración o animación simplificada basada en personajes estilizados de trazos sencillos que protagonizan narraciones visuales de alta retención.</td>
+            </tr>
+            <tr>
+              <td><strong>Hoja de Personaje (Character Sheet / Planilla)</strong></td>
+              <td>Documento visual de referencia en formato 16:9 (descargado a 1K) que muestra al personaje en diferentes vistas, expresiones o posturas para mantener su identidad fija en la IA.</td>
+            </tr>
+            <tr>
+              <td><strong>Texto a Voz (TTS - Text to Speech)</strong></td>
+              <td>Tecnología de síntesis neuronal en Luvvoice que transforma el guion escrito en una locución hablada con entonación humana exportable en MP3.</td>
+            </tr>
+            <tr>
+              <td><strong>Prompt</strong></td>
+              <td>Instrucción o comando en texto que se entrega a un modelo de Inteligencia Artificial (Gemini, Google Flow o Kimi) para obtener un resultado concreto.</td>
+            </tr>
+            <tr>
+              <td><strong>Ingeniería de Prompts (Prompt Engineering)</strong></td>
+              <td>Técnica de estructuración precisa de instrucciones (como el flujo en 3 fases o el uso de corchetes) para guiar a la IA sin ambigüedades.</td>
+            </tr>
+            <tr>
+              <td><strong>Agente (en Google Flow)</strong></td>
+              <td>Modo especial de la barra de Google Flow que permite enviar múltiples instrucciones en lote para procesar varios clips de vídeo simultáneamente.</td>
+            </tr>
+            <tr>
+              <td><strong>Procesamiento en Lote (Batch Processing)</strong></td>
+              <td>Generación conjunta y en paralelo de varios activos digitales (por ejemplo, enviar las Escenas 1, 2 y 3 juntas por 45 créditos).</td>
+            </tr>
+            <tr>
+              <td><strong>Consistencia Visual</strong></td>
+              <td>Capacidad técnica de conservar las mismas facciones, vestimenta, proporciones y estilo artístico del personaje a lo largo de todas las escenas del vídeo.</td>
+            </tr>
+            <tr>
+              <td><strong>Línea de Tiempo (Timeline)</strong></td>
+              <td>Área de trabajo horizontal en CapCut donde se colocan y superponen cronológicamente la pista de voz MP3 y los clips de vídeo MP4.</td>
+            </tr>
+            <tr>
+              <td><strong>Sincronización (Timing / Speed Sync)</strong></td>
+              <td>Ajuste exacto de la velocidad de reproducción de cada clip de vídeo para que la acción visual coincida al milisegundo con lo que dice el narrador.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="0">⬅ Anterior: INICIO</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="2">Siguiente: 2. PROCEDIMIENTO ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 2: PROCEDIMIENTO PASO A PASO
+       ===================================================================== -->
+  <section class="tab-section" id="sec-procedimiento" data-t="PROCEDIMIENTO">
+    <h2 class="section-main-title">2. Procedimiento Maestro Paso a Paso (De Cero al Vídeo Final)</h2>
+
+    <!-- CAPÍTULO 2 DEL MANUAL: PROMPT 1 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-1">Fase Operativa 1</span><span class="badge">Google Gemini</span></div>
+      <h3>2.1. De la Idea al Guion Narrativo Viral (Ejecución del Prompt 1)</h3>
+      <p><strong>Objetivo:</strong> Obtener un guion documental cronológico de alta retención centrado en un único personaje protagonista.</p>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">1</span><h4>Enviar el Prompt 1 Maestro en Google Gemini</h4></div>
+        <p><strong>Acción:</strong> Copia el <strong>Prompt 1</strong> (disponible aquí debajo o en la pestaña PROMPTS) y pégalo en una conversación nueva de Google Gemini.</p>
+        <div class="step-meta"><strong>Motivo:</strong> Este prompt programa a Gemini para trabajar en 3 fases estrictas sin adelantarse, asegurando que todas las ideas giren en torno a un único personaje central.</div>
+      </div>
+
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt 01 — Generación de Ideas y Guion en 3 Fases (Google Gemini)</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Actúa como un investigador, narrador y guionista experto en documentales de alta retención para YouTube (estilo animación Stickman / ensayo visual).
+
+Tu objetivo es guiarme a través de un flujo de trabajo estructurado en 3 FASES independientes.
+
+REGLA CRÍTICA DE PERSONAJE (APLICA A TODO EL FLUJO):
+- Todas las historias y guiones deben girar SIEMPRE en torno a un único personaje central o principal. Cualquier otro personaje que aparezca en el relato debe ser puramente anecdótico, puntual o de fondo. El objetivo es simplificar la posterior generación de contenidos y garantizar la consistencia visual.
+
+REGLA FUNDAMENTAL DE FLUJO DE TRABAJO:
+NO completes todas las fases de golpe. Debes avanzar una sola fase a la vez. Espera siempre a mi respuesta antes de pasar a la siguiente etapa.
+
+==================================================
+FASE 1 — GENERACIÓN DE 10 IDEAS DE TEMAS (PERSONAJE ÚNICO)
+==================================================
+En tu primera respuesta, tu ÚNICO cometido es generar 10 ideas de temas potentes para vídeos.
+- NO escribas el guion todavía.
+- NO pidas la duración del vídeo aún.
+
+Si yo ya he proporcionado una temática o nicho en el mensaje inicial, úsala inmediatamente para generar las 10 ideas.
+Si NO he indicado ninguna temática, tu única respuesta debe ser preguntar:
+"¿Sobre qué temática o nicho te gustaría recibir las 10 ideas de vídeos?"
+(Puedes dar como ejemplo: Historia Antigua, Ciencia, Psicología, Supervivencia, Tecnología, Casos Extraños, etc.).
+
+REQUISITOS DE LOS TEMAS:
+Cada idea debe:
+1. Despertar una curiosidad inmediata (brecha de conocimiento).
+2. Tener una pregunta central o un misterio potente.
+3. Estar estructurada con preguntas de impacto ("¿Por qué...", "¿Cómo...", "¿Qué pasaría si...", "¿Cuándo...").
+4. Evitar títulos genéricos o aburridos; deben invitar a hacer clic por pura fascinación.
+5. Estar concebida para contarse a través de la perspectiva y vivencias de UN SOLO personaje central o principal (los demás personajes serán meramente anecdóticos).
+6. Ser apta para una narrativa visual de animación rápida.
+
+FORMATO DE Salida FASE 1:
+10 Ideas de Vídeo
+1. [Título Gancho]
+2. [Explicación de una sola frase sobre el dilema central enfocado en el personaje principal]
+... (continuar hasta el 10)
+
+Al final del mensaje añade exactamente:
+"Selecciona un tema indicando su número (1–10)."
+Y DETENTE.
+
+==================================================
+FASE 2 — SELECCIÓN DE DURACIÓN
+==================================================
+Cuando yo elija un tema, confirma la elección pero NO escribas el guion.
+Solicita que elija la duración del vídeo presentando exactamente estas opciones:
+
+Elige la duración del vídeo:
+1. 1 minuto — Formato corto ultradinámico (Shorts/Reels) (~130–160 palabras).
+2. 3 minutos — Documental dinámico, al grano y de ritmo rápido (~400–500 palabras).
+3. 8 minutos — Documental detallado con contexto histórico/científico (~1.000–1.200 palabras).
+4. 12 minutos — Documental profundo con múltiples arcos narrativos (~1.500–1.800 palabras).
+5. 20 minutos — Gran ensayo documental con investigación extensa (~2.500–3.000 palabras).
+
+Pregunta: "¿Qué duración prefieres? (1, 3, 8, 12 o 20 minutos)"
+Y DETENTE.
+
+==================================================
+FASE 3 — GENERACIÓN DEL GUION TIPO DOCUMENTAL (ÚNICO PERSONAJE CENTRAL)
+==================================================
+Una vez seleccionada la duración, redacta el guion completo cumpliendo rigurosamente los siguientes estándares:
+
+ESTRUCTURA Y TÉCNICAS NARRATIVAS:
+- PROTAGONISTA ÚNICO: Mantén el foco narrativo en el único personaje central. Si aparecen otras figuras, deben ser breves, de fondo y no requerir desarrollo visual complejo.
+- EL GANCHO INICIAL: Captura la atención en los primeros segundos a través de la situación límite o dilema del personaje principal.
+- BUCLES DE CURIOSIDAD (Curiosity Loops): Abre preguntas continuamente en torno al dilema del protagonista.
+- RITMO Y DINAMISMO: Alterna frases cortas y contundentes preparadas para locución natural.
+- NARRATIVA VISUAL: Usa descripciones enfocadas en las acciones individuales del monigote (Stickman).
+- RIGOR Y PRECISIÓN: Mantén la precisión factual sin inventar datos.
+
+FORMATO DEL GUION:
+- Estilo prosa fluida organizada en párrafos.
+- NO incluyas marcas de tiempo (00:01) ni anotaciones técnicas de cámara.
+
+ENCABEZADO DE LA FASE 3:
+Inicia la respuesta de la Fase 3 así:
+[TEMA SELECCIONADO]
+Duración: [DURACIÓN SELECCIONADA]
+Y procede directamente con la narración del guion.
+
+==================================================
+INICIO DEL FLUJO DE TRABAJO
+==================================================
+Si en mi primer mensaje ya te he dado un tema, genera las 10 ideas. Si no, pregúntame por el nicho deseado.</pre>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">2</span><h4>Seleccionar Temática (1–10) y Duración (1 minuto recomendado)</h4></div>
+        <p><strong>Acción:</strong> Responde a Gemini con el nicho deseado (ej. <em>Historia Antigua</em>). Cuando te muestre las 10 ideas (como el caso del explorador griego que dibujó un continente inexistente o Piteas de Marsella), escribe el número elegido. Luego responde <strong>1 minuto</strong>.</p>
+        <div class="step-meta"><strong>Resultado esperado:</strong> Gemini redactará un guion en prosa continua (~130–160 palabras) sin marcas de tiempo molestas, listo para ser locutado. Cópialo a tu bloc de notas.</div>
+      </div>
+    </div>
+
+    <!-- CAPÍTULO 3 DEL MANUAL: PROMPT 2 Y PLANILLA -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-2">Fase Operativa 2</span><span class="badge">Gemini + Google Flow (Nano Banana Pro)</span></div>
+      <h3>2.2. Creación de la Hoja de Personaje y Consistencia Visual (Prompt 2)</h3>
+      <p><strong>Objetivo:</strong> Transformar el guion en una lámina de referencia visual a 1K del personaje principal para que nunca cambie de aspecto entre escenas.</p>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">1</span><h4>Abrir nueva conversación en Gemini y aplicar la Técnica de Corchetes</h4></div>
+        <p><strong>Acción:</strong> Abre un chat nuevo en Gemini, pega el <strong>Prompt 2</strong> y sustituye el marcador <code>[PEGAR AQUÍ EL GUION COMPLETO OBTENIDO EN EL PASO ANTERIOR]</code> por el texto de tu guion.</p>
+      </div>
+
+      <div class="compare-grid">
+        <div class="box-wrong">
+          <strong>❌ INCORRECTO (Error habitual):</strong>
+          Pegar el Prompt 2 en el mismo hilo antiguo o dejar el texto <code>[PEGAR AQUÍ EL GUION]</code> vacío esperando que Gemini adivine el guion.
+        </div>
+        <div class="box-right">
+          <strong>✅ CORRECTO (Técnica limpia):</strong>
+          Abrir un chat nuevo en Gemini y reemplazar exactamente los corchetes con el texto íntegro del guion de Piteas de Marsella.
+        </div>
+      </div>
+
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt 02 — Extracción de Personaje y 3 Prompts de Planilla (Gemini)</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Actúa como un director de arte y diseñador de personajes para animaciones 2D/Stickman con IA.
+Analiza el siguiente guion y extrae la descripción técnica y visual detallada de su personaje principal (cara, cuerpo, vestimenta, expresiones y estilo gráfico Stickman).
+Genera 3 opciones de prompts diferenciados e independientes en inglés (aptos para Google Flow / Nano Banana Pro) diseñados específicamente para renderizar una planilla u Hoja de Personaje (Character Sheet) en formato 16:9 que servirá de referencia visual para todo el vídeo.
+
+GUION BASE:
+[PEGAR AQUÍ EL GUION COMPLETO OBTENIDO EN EL PASO ANTERIOR]</pre>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">2</span><h4>Renderizar las 3 opciones en Google Flow con Nano Banana Pro</h4></div>
+        <p><strong>Acción:</strong> Ve a Google Flow, abre un proyecto nuevo y ajusta el panel flotante exactamente así:</p>
+        <ul>
+          <li><strong>Modo:</strong> Imagen</li>
+          <li><strong>Relación de aspecto (Aspect Ratio):</strong> <code>16:9</code></li>
+          <li><strong>Modelo:</strong> <code>Nano Banana Pro</code></li>
+          <li><strong>Cantidad:</strong> <code>x1</code> (una imagen por cada prompt enviado)</li>
+        </ul>
+        <p>Pega la Opción 1 en inglés que te dio Gemini y envíala. Repite con la Opción 2 y la Opción 3.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">3</span><h4>Seleccionar la mejor Planilla y Descargar a 1K</h4></div>
+        <p><strong>Acción:</strong> Observa las 3 hojas de personaje generadas, elige la que muestre al monigote más claro, limpio y en distintos ángulos, pulsa en el menú de <strong>tres puntos (⋯)</strong> de esa imagen y haz clic en <strong>Descargar a 1K</strong>.</p>
+        <div class="step-meta"><strong>Resultado esperado:</strong> Tendrás en tu dispositivo el archivo maestro en alta nitidez (1K) que servirá de molde para todas las animaciones.</div>
+      </div>
+    </div>
+
+    <!-- CAPÍTULO 4 DEL MANUAL: PROMPT 3 Y OVNI 11 FLASH -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-2">Fase Operativa 3</span><span class="badge">Gemini + Google Flow (OVNI 11 Flash)</span></div>
+      <h3>2.3. Desglose de Escenas y Animación en Lote (Prompt 3)</h3>
+      <p><strong>Objetivo:</strong> Dividir el guion en escenas numeradas y animarlas en paralelo manteniendo la consistencia del monigote.</p>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">1</span><h4>Ejecutar el Prompt 3 en Gemini adjuntando la Hoja de Personaje</h4></div>
+        <p><strong>Acción:</strong> Abre una tercera conversación nueva en Gemini, pega el <strong>Prompt 3</strong>, indica la duración (ej. 1 minuto), pega el guion completo y pulsa el botón <strong><code>+</code></strong> para subir la imagen de la Hoja de Personaje descargada a 1K.</p>
+      </div>
+
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt 03 — Desglose Cronológico de Escenas y Prompts para OVNI 11 Flash</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Actúa como un director de animación y supervisor de efectos visuales.
+Voy a proporcionarte la duración total del vídeo, el guion completo y la imagen de la Hoja de Personaje de referencia.
+
+Tu tarea es desglosar la historia en secuencias cronológicas individuales (Escena 1, Escena 2, etc.).
+Para cada escena debes proporcionar:
+1. El fragmento exacto del texto de la voz en off correspondiente.
+2. Un prompt detallado en inglés optimizado para el modelo de animación OVNI 11 Flash en Google Flow, describiendo la acción del personaje principal, el fondo y el movimiento de cámara estilo animación monigote (Stickman), garantizando la consistencia visual con la hoja de personaje adjunta.
+
+DURACIÓN TOTAL: [Indicar duración, ej. 1 minuto]
+GUION COMPLETO: [Pegar guion]
+HOJA DE PERSONAJE: [Imagen adjunta]</pre>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">2</span><h4>Configurar el Modo Agente y el Modelo OVNI 11 Flash en Google Flow</h4></div>
+        <p><strong>Acción:</strong> En Google Flow, activa la casilla <strong>Agente</strong> en la barra inferior. Entra en los ajustes del Agente y selecciona:</p>
+        <ul>
+          <li><strong>Generación de vídeo predeterminada:</strong> <code>16:9 * 1</code></li>
+          <li><strong>Modelo de IA:</strong> <code>OVNI 11 Flash</code></li>
+        </ul>
+        <p>Guarda la configuración.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">3</span><h4>Arrastrar la Planilla, pegar lote de 3 escenas y usar etiqueta <code>@</code> si es necesario</h4></div>
+        <p><strong>Acción:</strong> Arrastra con el ratón (o adjunta) el archivo de la Hoja de Personaje directamente dentro de la barra de prompts de Google Flow. Copia los prompts en inglés de las <strong>Escenas 1, 2 y 3</strong> y pégalos juntos. Pulsa en enviar y aprueba el consumo de <strong>45 créditos</strong> (de tus 50 diarios). Cuando terminen, pulsa en los tres puntos de cada clip y elige <strong>Descargar 720p</strong>.</p>
+        <div class="step-meta"><strong>Truco PRO con el comando <code>@</code>:</strong> Si en alguna escena compleja el personaje pierde su diseño, escribe <code>personaje @</code> y selecciona la imagen de la planilla subida (quedando <code>personaje @[Hoja_de_Personaje]</code>) para forzar el anclaje visual.</div>
+      </div>
+    </div>
+
+    <!-- CAPÍTULO 5 DEL MANUAL: LUVVOICE -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-1">Fase Operativa 4</span><span class="badge">Luvvoice / Loop Boys</span></div>
+      <h3>2.4. Síntesis de Voz en Off Profesional y Pausas Técnicas</h3>
+      <ol>
+        <li>Copia el guion narrativo completo generado en el Paso 1.</li>
+        <li>Entra en <strong>Luvvoice / Loop Boys</strong> (<code>https://luvvoice.com/es</code>), módulo <strong>Texto a voz</strong>, y pega el guion en el editor.</li>
+        <li>En el selector de idioma elige <code>Spanish</code> (Español de España) y selecciona una voz adecuada para narración documental (por ejemplo, <strong>Diego Herrera</strong> o <strong>Alvaro</strong>). Preescucha con el botón <em>Play</em>.</li>
+        <li>Sitúa el cursor donde quieras añadir dramatismo o respiración y pulsa el botón de <strong>Pausas</strong>, insertando silencios de entre <code>0.5s</code> y <code>5s</code> (recuerda no superar el máximo recomendado de <strong>20 pausas por conversión</strong>).</li>
+        <li>Ajusta velocidad y tono si lo deseas, pulsa <strong>Generar voz</strong> y descarga el archivo final en formato <strong>MP3</strong>.</li>
+      </ol>
+    </div>
+
+    <!-- CAPÍTULO 6 Y 7 DEL MANUAL: CAPCUT Y KIMI -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-1">Fase Operativa 5 y 6</span><span class="badge">CapCut + Kimi (Moonshot K31)</span></div>
+      <h3>2.5. Edición y Sincronización en CapCut + Expansión con Kimi K31</h3>
+      <h4>Montaje y Ajuste de Velocidad en CapCut:</h4>
+      <ol>
+        <li>Crea un proyecto nuevo en CapCut e importa el audio <strong>MP3</strong> de Luvvoice y todos los clips <strong>720p</strong> de Google Flow.</li>
+        <li>Coloca el audio MP3 en la pista principal de la línea de tiempo y sitúa encima los clips de vídeo en orden numérico (Escena 1, Escena 2, etc.).</li>
+        <li><strong>Sincronización por Velocidad (Speed Sync):</strong> Si la locución de una escena dura más o menos que el clip animado, selecciona el clip de vídeo, abre la pestaña <strong>Velocidad (Speed)</strong> y modifica ligeramente el multiplicador (acelerando o ralentizando el clip) hasta que el corte visual cuadre al milisegundo con la voz.</li>
+        <li>Añade transiciones suaves (fundidos o disoluciones), música de fondo tenue sin copyright y exporta el proyecto en <strong>MP4 (720p o 1080p)</strong>.</li>
+      </ol>
+      <h4>Uso Avanzado Complementario con Kimi (Moonshot AI K31):</h4>
+      <p>Desde la web de Kimi con el modelo gratuito <strong>K31</strong> puedes ampliar tus producciones en dos vertientes documentadas:</p>
+      <ul>
+        <li><strong>Prototipado de videojuegos 3D interactivos:</strong> Pídele en lenguaje natural un juego de carreras 3D con vehículos con disparo delantero y controles funcionales; Kimi compilará el código ejecutable directamente en el navegador.</li>
+        <li><strong>Preproducción completa de Mini Dramas:</strong> Solicita un plan de producción y Kimi te entregará estructuradamente: 1) Guion del primer episodio, 2) <em>Storyboard</em> o escaleta visual, 3) Lista detallada de planos (<em>shot list</em>) y 4) Orden técnico de rodaje.</li>
+      </ul>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="1">⬅ Anterior: CONCEPTOS</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="3">Siguiente: 3. PRÁCTICA ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 3: PRÁCTICA Y PROYECTOS INTEGRADORES
+       ===================================================================== -->
+  <section class="tab-section" id="sec-practica" data-t="PRÁCTICA">
+    <h2 class="section-main-title">3. Práctica Guiada, Proyectos Integradores y Ejercicios Resueltos</h2>
+
+    <div class="card">
+      <div class="badge-row"><span class="badge level-2">Proyecto Integrador 1</span><span class="badge">Caso Real Documentado</span></div>
+      <h3>3.1. Proyecto Práctico 1: Documental Histórico de 1 Minuto («Piteas de Marsella»)</h3>
+      <p><strong>Objetivo del proyecto:</strong> Producir de principio a fin un vídeo corto viral de 1 minuto narrando el viaje real del explorador griego <strong>Piteas de Marsella</strong> hacia el océano Ártico y la mítica tierra helada de Tule.</p>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Etapa</th>
+              <th>Herramienta y Configuración</th>
+              <th>Ejecución Exacta y Resultado Verificable</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Guion</strong></td>
+              <td>Google Gemini (Prompt 1)</td>
+              <td>Se elige temática de Historia Antigua, opción sobre Piteas de Marsella y duración de <strong>1 minuto</strong> (~130–160 palabras). Se obtiene prosa fluida con gancho en los primeros 3 segundos sobre el mar congelado.</td>
+            </tr>
+            <tr>
+              <td><strong>2. Locución</strong></td>
+              <td>Luvvoice / Loop Boys (Español de España)</td>
+              <td>Se pega el guion, se elige voz masculina de narración profunda (ej. <em>Diego Herrera</em> o <em>Alvaro</em>), se insertan pausas de <code>0.5s</code> a <code>1.0s</code> tras las preguntas retóricas y se descarga el archivo <code>piteas_voz.mp3</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>3. Planilla 1K</strong></td>
+              <td>Gemini (Prompt 2) ➔ Google Flow (Nano Banana Pro, 16:9, x1)</td>
+              <td>Gemini genera 3 prompts en inglés describiendo al monigote de Piteas (túnica griega, barba estilizada, astrolabio/mapa). Se renderizan las 3 opciones en Google Flow y se descarga la más clara a <strong>1K</strong>.</td>
+            </tr>
+            <tr>
+              <td><strong>4. Animación</strong></td>
+              <td>Gemini (Prompt 3) ➔ Google Flow (Agente, OVNI 11 Flash, 16:9 * 1)</td>
+              <td>Gemini divide el minuto en <strong>6 escenas</strong>. En Google Flow se arrastra la planilla a la barra y se envía el Lote 1 (Escenas 1 a 3 = 45 créditos). Se descargan en <strong>720p</strong>.</td>
+            </tr>
+            <tr>
+              <td><strong>5. Montaje</strong></td>
+              <td>CapCut (Línea de tiempo)</td>
+              <td>Se coloca <code>piteas_voz.mp3</code> abajo y las 6 escenas arriba. Se ajusta la velocidad (<em>Speed</em>) de cada clip para que el movimiento labial/corporal y los cambios de plano coincidan con la narración. Exportación en MP4.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="badge-row"><span class="badge level-3">Proyecto Integrador 2</span><span class="badge">Estrategia Multicuenta PRO</span></div>
+      <h3>3.2. Proyecto Práctico 2: Producción Diaria de 6 a 9 Clips sin Pagar Suscripciones</h3>
+      <p><strong>Planteamiento del problema:</strong> Un vídeo de 1 minuto desglosado por Gemini requiere habitualmente 6 escenas, pero una sola cuenta gratuita de Google Flow recibe 50 créditos diarios y cada lote de 3 escenas consume 45 créditos (quedando solo 5 créditos restantes).</p>
+      <p><strong>Protocolo de ejecución paso a paso:</strong></p>
+      <ol>
+        <li><strong>En la Cuenta Gmail A:</strong> Genera la Hoja de Personaje con Nano Banana Pro y descárgala a <strong>1K</strong> en una carpeta local de tu dispositivo.</li>
+        <li><strong>En la misma Cuenta Gmail A:</strong> Activa el Agente con <strong>OVNI 11 Flash</strong>, arrastra la planilla 1K y envía las <strong>Escenas 1, 2 y 3</strong> (consumes 45 créditos). Descarga los archivos <code>escena_01.mp4</code>, <code>escena_02.mp4</code> y <code>escena_03.mp4</code> en 720p.</li>
+        <li><strong>Cambio a la Cuenta Gmail B:</strong> Abre una ventana de incógnito o cambia de perfil en el navegador e inicia sesión en Google Flow con tu segunda cuenta de Google (que dispone de sus propios <strong>50 créditos intactos</strong>).</li>
+        <li><strong>Continuidad de Consistencia:</strong> Crea un proyecto nuevo en la Cuenta B, activa el Agente (<code>16:9 * 1</code>, <code>OVNI 11 Flash</code>) y <strong>arrastra exactamente la misma Hoja de Personaje a 1K</strong> que descargaste en el paso 1.</li>
+        <li><strong>Lote 2 en el mismo día:</strong> Pega los prompts de las <strong>Escenas 4, 5 y 6</strong>, aprueba los 45 créditos de la Cuenta B y descarga <code>escena_04.mp4</code>, <code>escena_05.mp4</code> y <code>escena_06.mp4</code>. Si tu vídeo requiere 9 escenas, repite con una Cuenta C.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>3.3. Ejercicios Prácticos de Autoevaluación con Solución Explicada</h3>
+
+      <details class="qa-item">
+        <summary>Ejercicio 1: El monigote aparece con sombrero distinto en la Escena 4. ¿Cómo lo corriges exactamente?</summary>
+        <div class="qa-body">
+          <p><strong>Solución explicada:</strong> No basta con volver a enviar el prompt de texto solo. Debes asegurarte de que la Hoja de Personaje a 1K esté arrastrada en la barra de Google Flow y, además, escribir explícitamente dentro del texto del prompt de la Escena 4 el comando <code>personaje @</code> seleccionando del desplegable la imagen de tu planilla (<code>personaje @[Hoja_de_Personaje]</code>). Esto fuerza al modelo OVNI 11 Flash a obedecer el diseño original.</p>
+        </div>
+      </details>
+
+      <details class="qa-item">
+        <summary>Ejercicio 2: En CapCut, el audio de la Escena 2 dura 9 segundos pero el clip de Google Flow dura 6 segundos. ¿Qué haces?</summary>
+        <div class="qa-body">
+          <p><strong>Solución explicada:</strong> Seleccionas el clip de la Escena 2 en la línea de tiempo de CapCut, abres la herramienta <strong>Velocidad (Speed)</strong> y reduces ligeramente el multiplicador de velocidad (ralentizando la animación de forma fluida) hasta que el clip cubra exactamente los 9 segundos de locución sin dejar huecos en negro.</p>
+        </div>
+      </details>
+
+      <details class="qa-item">
+        <summary>Ejercicio 3: Al pulsar «Generar voz» en Luvvoice aparece el aviso «Algo salió mal». ¿Cuál es la causa y cómo procedes?</summary>
+        <div class="qa-body">
+          <p><strong>Solución explicada:</strong> La causa documentada es la interferencia de extensiones o plugins de traducción automática del navegador con las peticiones AJAX de Luvvoice. Debes desactivar el traductor automático o las extensiones activas para ese sitio, recargar la página con <code>F5</code> y volver a pulsar en Generar voz.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="2">⬅ Anterior: PROCEDIMIENTO</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="4">Siguiente: 4. PROMPTS ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 4: PROMPTS (RECOPILATORIO COMPLETO CON DESCRIPCIÓN DE USO)
+       ===================================================================== -->
+  <section class="tab-section" id="sec-prompts" data-t="PROMPTS">
+    <h2 class="section-main-title">4. Recopilatorio Completo de Prompts y Plantillas de Comandos</h2>
+    <p>En esta pestaña dedicada tienes reunidos <strong>todos los prompts, plantillas y comandos literales</strong> empleados a lo largo del tutorial, junto con una explicación clara de <strong>dónde y en qué momento se utiliza cada uno</strong>, listos para copiar con un solo toque.</p>
+
+    <!-- PROMPT 1 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-1">Prompt 01</span><span class="badge">Google Gemini (Conversación 1)</span></div>
+      <h3>4.1. Prompt 01: Generación de Ideas y Guion Narrativo en 3 Fases</h3>
+      <p><strong>¿Dónde y para qué se emplea?:</strong> Se utiliza en la <strong>primera conversación de Google Gemini</strong> al iniciar cualquier proyecto. Guía a la IA paso a paso para: 1) Proponer 10 ideas virales centradas en un único personaje protagonista, 2) Permitir elegir la duración (1, 3, 8, 12 o 20 minutos) y 3) Redactar el guion documental completo en prosa continua sin marcas de tiempo.</p>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt 01 — Texto Íntegro para Google Gemini</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Actúa como un investigador, narrador y guionista experto en documentales de alta retención para YouTube (estilo animación Stickman / ensayo visual).
+
+Tu objetivo es guiarme a través de un flujo de trabajo estructurado en 3 FASES independientes.
+
+REGLA CRÍTICA DE PERSONAJE (APLICA A TODO EL FLUJO):
+- Todas las historias y guiones deben girar SIEMPRE en torno a un único personaje central o principal. Cualquier otro personaje que aparezca en el relato debe ser puramente anecdótico, puntual o de fondo. El objetivo es simplificar la posterior generación de contenidos y garantizar la consistencia visual.
+
+REGLA FUNDAMENTAL DE FLUJO DE TRABAJO:
+NO completes todas las fases de golpe. Debes avanzar una sola fase a la vez. Espera siempre a mi respuesta antes de pasar a la siguiente etapa.
+
+==================================================
+FASE 1 — GENERACIÓN DE 10 IDEAS DE TEMAS (PERSONAJE ÚNICO)
+==================================================
+En tu primera respuesta, tu ÚNICO cometido es generar 10 ideas de temas potentes para vídeos.
+- NO escribas el guion todavía.
+- NO pidas la duración del vídeo aún.
+
+Si yo ya he proporcionado una temática o nicho en el mensaje inicial, úsala inmediatamente para generar las 10 ideas.
+Si NO he indicado ninguna temática, tu única respuesta debe ser preguntar:
+"¿Sobre qué temática o nicho te gustaría recibir las 10 ideas de vídeos?"
+(Puedes dar como ejemplo: Historia Antigua, Ciencia, Psicología, Supervivencia, Tecnología, Casos Extraños, etc.).
+
+REQUISITOS DE LOS TEMAS:
+Cada idea debe:
+1. Despertar una curiosidad inmediata (brecha de conocimiento).
+2. Tener una pregunta central o un misterio potente.
+3. Estar estructurada con preguntas de impacto ("¿Por qué...", "¿Cómo...", "¿Qué pasaría si...", "¿Cuándo...").
+4. Evitar títulos genéricos o aburridos; deben invitar a hacer clic por pura fascinación.
+5. Estar concebida para contarse a través de la perspectiva y vivencias de UN SOLO personaje central o principal (los demás personajes serán meramente anecdóticos).
+6. Ser apta para una narrativa visual de animación rápida.
+
+FORMATO DE Salida FASE 1:
+10 Ideas de Vídeo
+1. [Título Gancho]
+2. [Explicación de una sola frase sobre el dilema central enfocado en el personaje principal]
+... (continuar hasta el 10)
+
+Al final del mensaje añade exactamente:
+"Selecciona un tema indicando su número (1–10)."
+Y DETENTE.
+
+==================================================
+FASE 2 — SELECCIÓN DE DURACIÓN
+==================================================
+Cuando yo elija un tema, confirma la elección pero NO escribas el guion.
+Solicita que elija la duración del vídeo presentando exactamente estas opciones:
+
+Elige la duración del vídeo:
+1. 1 minuto — Formato corto ultradinámico (Shorts/Reels) (~130–160 palabras).
+2. 3 minutos — Documental dinámico, al grano y de ritmo rápido (~400–500 palabras).
+3. 8 minutos — Documental detallado con contexto histórico/científico (~1.000–1.200 palabras).
+4. 12 minutos — Documental profundo con múltiples arcos narrativos (~1.500–1.800 palabras).
+5. 20 minutos — Gran ensayo documental con investigación extensa (~2.500–3.000 palabras).
+
+Pregunta: "¿Qué duración prefieres? (1, 3, 8, 12 o 20 minutos)"
+Y DETENTE.
+
+==================================================
+FASE 3 — GENERACIÓN DEL GUION TIPO DOCUMENTAL (ÚNICO PERSONAJE CENTRAL)
+==================================================
+Una vez seleccionada la duración, redacta el guion completo cumpliendo rigurosamente los siguientes estándares:
+
+ESTRUCTURA Y TÉCNICAS NARRATIVAS:
+- PROTAGONISTA ÚNICO: Mantén el foco narrativo en el único personaje central. Si aparecen otras figuras, deben ser breves, de fondo y no requerir desarrollo visual complejo.
+- EL GANCHO INICIAL: Captura la atención en los primeros segundos a través de la situación límite o dilema del personaje principal.
+- BUCLES DE CURIOSIDAD (Curiosity Loops): Abre preguntas continuamente en torno al dilema del protagonista.
+- RITMO Y DINAMISMO: Alterna frases cortas y contundentes preparadas para locución natural.
+- NARRATIVA VISUAL: Usa descripciones enfocadas en las acciones individuales del monigote (Stickman).
+- RIGOR Y PRECISIÓN: Mantén la precisión factual sin inventar datos.
+
+FORMATO DEL GUION:
+- Estilo prosa fluida organizada en párrafos.
+- NO incluyas marcas de tiempo (00:01) ni anotaciones técnicas de cámara.
+
+ENCABEZADO DE LA FASE 3:
+Inicia la respuesta de la Fase 3 así:
+[TEMA SELECCIONADO]
+Duración: [DURACIÓN SELECCIONADA]
+Y procede directamente con la narración del guion.
+
+==================================================
+INICIO DEL FLUJO DE TRABAJO
+==================================================
+Si en mi primer mensaje ya te he dado un tema, genera las 10 ideas. Si no, pregúntame por el nicho deseado.</pre>
+      </div>
+    </div>
+
+    <!-- PROMPT 2 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-2">Prompt 02</span><span class="badge">Google Gemini (Conversación 2)</span></div>
+      <h3>4.2. Prompt 02: Creación de la Hoja de Personaje (Character Sheet)</h3>
+      <p><strong>¿Dónde y para qué se emplea?:</strong> Se utiliza abriendo una <strong>segunda conversación nueva en Google Gemini</strong>. Debes sustituir los corchetes finales por el guion obtenido con el Prompt 01. Gemini analizará al protagonista y te devolverá 3 variantes de prompts en inglés listas para llevar a Google Flow.</p>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt 02 — Diseño de Hoja de Personaje con Técnica de Corchetes</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Actúa como un director de arte y diseñador de personajes para animaciones 2D/Stickman con IA.
+Analiza el siguiente guion y extrae la descripción técnica y visual detallada de su personaje principal (cara, cuerpo, vestimenta, expresiones y estilo gráfico Stickman).
+Genera 3 opciones de prompts diferenciados e independientes en inglés (aptos para Google Flow / Nano Banana Pro) diseñados específicamente para renderizar una planilla u Hoja de Personaje (Character Sheet) en formato 16:9 que servirá de referencia visual para todo el vídeo.
+
+GUION BASE:
+[PEGAR AQUÍ EL GUION COMPLETO OBTENIDO EN EL PASO ANTERIOR]</pre>
+      </div>
+    </div>
+
+    <!-- PLANTILLA RENDERIZADO PLANILLA EN GOOGLE FLOW -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-2">Plantilla Google Flow Imagen</span><span class="badge">Modelo Nano Banana Pro</span></div>
+      <h3>4.3. Plantilla de Renderizado de Planilla en Google Flow</h3>
+      <p><strong>¿Dónde y para qué se emplea?:</strong> Se emplea en <strong>Google Flow</strong> (configurado en <strong>Modo Imagen</strong>, relación de aspecto <strong>16:9</strong>, modelo <strong>Nano Banana Pro</strong> y cantidad <strong>x1</strong>). Se envían una por una las 3 opciones en inglés que entregó Gemini en el paso anterior para elegir la mejor y descargarla a <strong>1K</strong>.</p>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Estructura de Envío de Opciones de Planilla en Google Flow</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">[Opción 1 de Prompt entregada por Gemini para Character Sheet en inglés]
+[Opción 2 de Prompt entregada por Gemini para Character Sheet en inglés]
+[Opción 3 de Prompt entregada por Gemini para Character Sheet en inglés]</pre>
+      </div>
+    </div>
+
+    <!-- PROMPT 3 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-2">Prompt 03</span><span class="badge">Google Gemini (Conversación 3)</span></div>
+      <h3>4.4. Prompt 03: Desglose de Escenas y Prompts de Animación</h3>
+      <p><strong>¿Dónde y para qué se emplea?:</strong> Se emplea en una <strong>tercera conversación nueva en Google Gemini</strong>. Se acompaña indicando la duración, pegando el guion y <strong>subiendo con el botón <code>+</code> la imagen a 1K de la Hoja de Personaje</strong>. Gemini dividirá todo el vídeo en escenas cronológicas con su texto de voz en off y su prompt de animación en inglés.</p>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt 03 — Desglose de Escenas con Hoja de Personaje Adjunta</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Actúa como un director de animación y supervisor de efectos visuales.
+Voy a proporcionarte la duración total del vídeo, el guion completo y la imagen de la Hoja de Personaje de referencia.
+
+Tu tarea es desglosar la historia en secuencias cronológicas individuales (Escena 1, Escena 2, etc.).
+Para cada escena debes proporcionar:
+1. El fragmento exacto del texto de la voz en off correspondiente.
+2. Un prompt detallado en inglés optimizado para el modelo de animación OVNI 11 Flash en Google Flow, describiendo la acción del personaje principal, el fondo y el movimiento de cámara estilo animación monigote (Stickman), garantizando la consistencia visual con la hoja de personaje adjunta.
+
+DURACIÓN TOTAL: [Indicar duración, ej. 1 minuto]
+GUION COMPLETO: [Pegar guion]
+HOJA DE PERSONAJE: [Imagen adjunta]</pre>
+      </div>
+    </div>
+
+    <!-- COMANDOS DE LOTE Y ARROBA EN GOOGLE FLOW -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-3">Comandos Google Flow Vídeo</span><span class="badge">Agente + OVNI 11 Flash</span></div>
+      <h3>4.5. Comandos de Animación en Lote y Forzado de Consistencia con <code>@</code></h3>
+      <p><strong>¿Dónde y para qué se emplea?:</strong> Se emplea en la barra de comandos de <strong>Google Flow</strong> tras activar el modo <strong>Agente</strong> (configurado en <code>16:9 * 1</code> y modelo <code>OVNI 11 Flash</code>) y haber arrastrado dentro la Hoja de Personaje. Permite generar 3 escenas de golpe (consumiendo 45 créditos) o reparar desviaciones visuales mediante el comando <code>personaje @[Hoja_de_Personaje]</code>.</p>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Plantilla de Lote (3 Escenas) en Modo Agente de Google Flow</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">[Prompt de animación en inglés para Escena 1]
+[Prompt de animación en inglés para Escena 2]
+[Prompt de animación en inglés para Escena 3]</pre>
+      </div>
+
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Comando Especial @ para Forzar Consistencia del Monigote en Google Flow</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">[Prompt de la escena con desviación visual] personaje @[Hoja_de_Personaje]</pre>
+      </div>
+    </div>
+
+    <!-- PROMPTS COMPLEMENTARIOS KIMI K31 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-3">Prompts Complementarios</span><span class="badge">Kimi (Moonshot AI K31)</span></div>
+      <h3>4.6. Prompts para Prototipado 3D y Plan de Rodaje de Mini Dramas en Kimi</h3>
+      <p><strong>¿Dónde y para qué se emplea?:</strong> Se emplean en la plataforma web de <strong>Kimi (modelo gratuito K31 de Moonshot AI)</strong> cuando deseas generar un prototipo jugable en 3D directamente en el navegador o estructurar toda la preproducción técnica (guion, <em>storyboard</em>, lista de planos y orden de rodaje) de una serie o mini drama.</p>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt Kimi 01 — Prototipado Interactivo de Videojuego de Carreras 3D</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Crea un prototipo interactivo de videojuego de carreras 3D donde los vehículos tengan sistema de disparo delantero y controles de aceleración e interfaz funcional.</pre>
+      </div>
+
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Prompt Kimi 02 — Planificación Completa de Producción para Mini Dramas</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">Desarrolla un plan de producción completo para una idea de mini drama que entregue: 1. Guion del primer episodio, 2. Storyboard del episodio, 3. Lista de planos requeridos, 4. Orden técnico de rodaje.</pre>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="3">⬅ Anterior: PRÁCTICA</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="5">Siguiente: 5. 33 Preguntas (Q&amp;A) ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 5: 33 PREGUNTAS (Q&A) - ANTES DE ERRORES
+       ===================================================================== -->
+  <section class="tab-section" id="sec-qa" data-t="33 Preguntas (Q&A)">
+    <h2 class="section-main-title">5. Las 33 Preguntas y Respuestas (Q&amp;A) Ordenadas por Nivel de Dificultad</h2>
+    <p>Consulta las <strong>33 preguntas técnicas y operativas</strong> del manual estructuradas progresivamente en <strong>Nivel 1 (Básico: 1 a 11)</strong>, <strong>Nivel 2 (Avanzado: 12 a 22)</strong> y <strong>Nivel 3 (PRO: 23 a 33)</strong>.</p>
+
+    <div class="svg-controls-bar">
+      <button type="button" class="chip" id="btn-expand-all-qa">➕ Desplegar las 33 respuestas</button>
+      <button type="button" class="chip" id="btn-collapse-all-qa">➖ Plegar todas</button>
+    </div>
+
+    <!-- NIVEL 1: PREGUNTAS 1 A 11 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-1">Nivel 1 — Básico (Preguntas 1 a 11)</span></div>
+      <h3>5.1. Nivel 1: Fundamentos, Costes, Formatos y Herramientas</h3>
+
+      <details class="qa-item" open>
+        <summary>1. ¿Necesito saber dibujar o usar programas profesionales de diseño para hacer estos vídeos?</summary>
+        <div class="qa-body"><p>No. Todo el proceso visual es ejecutado íntegramente por herramientas de Inteligencia Artificial como <strong>Google Flow</strong> a partir de descripciones en texto e imágenes de referencia generadas con la ayuda de <strong>Google Gemini</strong>.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>2. ¿Cuánto cuesta la suite de herramientas utilizadas en este tutorial?</summary>
+        <div class="qa-body"><p>Todas las herramientas explicadas en el flujo de trabajo (<strong>Google Gemini</strong>, <strong>Luvvoice / Loop Boys</strong>, <strong>Google Flow</strong>, <strong>CapCut</strong> y <strong>Kimi K31</strong>) cuentan con planes o modalidades <strong>100% gratuitas</strong>.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>3. ¿Qué es un monigote o Stickman en el contexto de vídeos virales?</summary>
+        <div class="qa-body"><p>Es un personaje animado de líneas o trazos simplificados que protagoniza narraciones visuales y documentales dinámicos de gran éxito y retención en plataformas como YouTube y TikTok.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>4. ¿Qué formato de audio genera Luvvoice?</summary>
+        <div class="qa-body"><p>Luvvoice exporta las locuciones directamente en un archivo de audio digital estándar en formato <strong>MP3</strong> listo para importar en cualquier editor de vídeo.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>5. ¿Cuántos caracteres gratis al mes ofrece el plan básico de Luvvoice / Loop Boys?</summary>
+        <div class="qa-body"><p>Permite procesar hasta <strong>10.000 caracteres mensuales</strong> en su plan gratuito al registrarse e iniciar sesión con una cuenta de Google.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>6. ¿En qué resolución se pueden descargar los clips de vídeo en Google Flow sin pagar?</summary>
+        <div class="qa-body"><p>En la modalidad gratuita de Google Flow, los clips de animación generados con el modelo OVNI 11 Flash se descargan en resolución <strong>720p</strong>.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>7. ¿En qué resolución se recomienda descargar la Hoja de Personaje?</summary>
+        <div class="qa-body"><p>La Hoja de Personaje o planilla debe descargarse en resolución <strong>1K</strong> desde el menú de tres puntos de Google Flow para garantizar la máxima nitidez al usarla como referencia.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>8. ¿Qué herramienta se utiliza para unir el audio y los vídeos en el montaje final?</summary>
+        <div class="qa-body"><p>Se utiliza el editor de vídeo <strong>CapCut</strong> (disponible gratuitamente tanto en versión web desde el navegador como en aplicación de escritorio).</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>9. ¿Qué relación de aspecto (Aspect Ratio) se debe configurar para vídeos horizontales de YouTube?</summary>
+        <div class="qa-body"><p>Se debe seleccionar la relación de aspecto panorámica <strong><code>16:9</code></strong> tanto al crear la Hoja de Personaje como al configurar el Agente de vídeo en Google Flow.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>10. ¿Cuál es la función principal del Prompt 1 en Gemini?</summary>
+        <div class="qa-body"><p>Guiar al usuario en 3 fases para generar 10 ideas temáticas de alta curiosidad, elegir la duración y redactar el guion narrativo completo centrado en un único personaje protagonista.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>11. ¿Se requiere instalar programas pesados en mi ordenador?</summary>
+        <div class="qa-body"><p>No. Salvo el editor CapCut si prefieres su versión de escritorio (aunque también cuenta con versión web), todas las tareas pesadas de IA se ejecutan online desde el navegador en la nube.</p></div>
+      </details>
+    </div>
+
+    <!-- NIVEL 2: PREGUNTAS 12 A 22 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-2">Nivel 2 — Avanzado (Preguntas 12 a 22)</span></div>
+      <h3>5.2. Nivel 2: Consistencia Visual, Modelos IA, Créditos y Sincronización</h3>
+
+      <details class="qa-item">
+        <summary>12. ¿Por qué es imprescindible crear una Hoja de Personaje (Character Sheet)?</summary>
+        <div class="qa-body"><p>Porque evita que el modelo de Inteligencia Artificial dibuje un personaje distinto o con facciones y ropas diferentes en cada escena, garantizando la <strong>consistencia visual</strong> a lo largo de todo el vídeo.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>13. ¿Cómo se introduce el guion en el Prompt 2 dentro de Gemini?</summary>
+        <div class="qa-body"><p>Se abre una conversación nueva en Gemini, se pega el Prompt 2 y se reemplaza el marcador entre corchetes <code>[PEGAR AQUÍ EL GUION COMPLETO OBTENIDO EN EL PASO ANTERIOR]</code> pegando el guion completo.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>14. ¿Qué modelo de imagen se debe seleccionar en Google Flow para crear la planilla?</summary>
+        <div class="qa-body"><p>Se debe seleccionar el modo Imagen, configurar el modelo <strong><code>Nano Banana Pro</code></strong>, relación de aspecto <code>16:9</code> y cantidad <code>x1</code>.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>15. ¿Qué modelo de vídeo se activa en Google Flow para generar los clips de animación?</summary>
+        <div class="qa-body"><p>Se activa el modo <strong>Agente</strong> y en sus ajustes se selecciona el modelo de vídeo <strong><code>OVNI 11 Flash</code></strong> con generación predeterminada <code>16:9 * 1</code>.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>16. ¿Cuántos créditos diarios gratuitos asigna Google Flow por cuenta?</summary>
+        <div class="qa-body"><p>Google Flow asigna un saldo renovable automáticamente de <strong>50 puntos o créditos diarios gratuitos</strong> cada 24 horas por cada cuenta de Google.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>17. ¿Cuántos créditos consume la generación de un lote de 3 vídeos en Google Flow?</summary>
+        <div class="qa-body"><p>El procesamiento en lote (<em>batch</em>) de 3 escenas de animación simultáneas consume <strong>45 créditos</strong> del saldo diario de 50 puntos.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>18. ¿Cómo se vincula la Hoja de Personaje en la barra de prompts de Google Flow?</summary>
+        <div class="qa-body"><p>Arrastrando el archivo de la imagen a 1K descargada directamente con el ratón (o adjuntándola) hacia el interior de la barra de texto del prompt antes de enviar las escenas.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>19. ¿Puedo usar los audios generados en Luvvoice para monetizar vídeos en YouTube?</summary>
+        <div class="qa-body"><p>Sí. Según las condiciones documentadas de la plataforma, el usuario conserva la plena propiedad sobre los archivos MP3 generados en Luvvoice y puede utilizarlos en proyectos comerciales como canales de YouTube o podcasts.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>20. ¿Cómo se introducen pausas de silencio en Luvvoice?</summary>
+        <div class="qa-body"><p>Habiendo iniciado sesión, se coloca el cursor en el punto exacto del texto donde se desea la pausa y se pulsa el botón de <strong>Pausas</strong> en la barra de herramientas, eligiendo una duración de entre <strong>0.5s y 5s</strong>.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>21. ¿Qué hago si la locución de audio dura más tiempo que el clip de vídeo en CapCut?</summary>
+        <div class="qa-body"><p>Se selecciona el clip de vídeo en la línea de tiempo de CapCut y se modifica su velocidad de reproducción en el panel <strong>Velocidad (Speed)</strong> para ralentizar o acelerar ligeramente la animación hasta que coincida con la voz en off.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>22. ¿Para qué sirve la herramienta Kimi (Moonshot AI K31) en este ecosistema?</summary>
+        <div class="qa-body"><p>Sirve como herramienta avanzada complementaria para dos tareas: crear prototipos interactivos de videojuegos 3D jugables en navegador y estructurar planes completos de producción (guion, <em>storyboard</em>, lista de planos y orden de rodaje) para mini dramas.</p></div>
+      </details>
+    </div>
+
+    <!-- NIVEL 3: PREGUNTAS 23 A 33 -->
+    <div class="card">
+      <div class="badge-row"><span class="badge level-3">Nivel 3 — PRO (Preguntas 23 a 33)</span></div>
+      <h3>5.3. Nivel 3: Ingeniería Avanzada, Comando <code>@</code>, Multicuenta y API</h3>
+
+      <details class="qa-item">
+        <summary>23. ¿En qué consiste el comando @ y cómo soluciona los problemas de inconsistencia severos en Google Flow?</summary>
+        <div class="qa-body"><p>Escribiendo la palabra <code>personaje @</code> dentro del prompt de la escena problemática y seleccionando la imagen de la planilla subida (<code>personaje @[Hoja_de_Personaje]</code>), se crea un hiperenlace de referencia estricto que fuerza al modelo OVNI 11 Flash a calcar los rasgos físicos y vestimenta del monigote original.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>24. ¿Cómo se ejecuta la estrategia multicuenta para superar el límite de 3 vídeos diarios en Google Flow?</summary>
+        <div class="qa-body"><p>Al agotar los 45 créditos del primer lote en la Cuenta A, se inicia sesión en Google Flow con una segunda cuenta de Google (Cuenta B) que cuenta con 50 créditos nuevos, se vuelve a arrastrar el archivo local de la Hoja de Personaje a 1K original y se procesan las escenas 4, 5 y 6 en el mismo día sin esperar 24 horas.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>25. ¿Por qué ocurre el error «Algo salió mal» al generar voz en Luvvoice y cómo se soluciona?</summary>
+        <div class="qa-body"><p>Está provocado por extensiones o plugins de traducción automática/conversión instalados en el navegador web que alteran el DOM y bloquean las peticiones AJAX de Luvvoice. Se soluciona desactivando dichos plugins, recargando la página (<code>F5</code>) y pulsando nuevamente en Generar.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>26. ¿Por qué Luvvoice no puede extraer el texto de algunos archivos PDF?</summary>
+        <div class="qa-body"><p>Porque se trata de documentos PDF escaneados o compuestos exclusivamente por imágenes rasterizadas sin una capa de texto seleccionable (OCR). Para solucionarlo, se deben subir PDF nativos con texto seleccionable o archivos <code>.txt</code>.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>27. ¿Qué cantidad máxima de pausas se recomienda no superar en una conversión de Luvvoice?</summary>
+        <div class="qa-body"><p>Se recomienda <strong>no superar las 20 pausas</strong> por cada bloque de conversión para evitar fallos de procesamiento o distorsiones en el motor de síntesis de voz.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>28. ¿Cuál es el límite máximo de caracteres por conversión individual en Luvvoice para usuarios registrados?</summary>
+        <div class="qa-body"><p>Los usuarios registrados que han iniciado sesión pueden convertir bloques de texto de hasta <strong>20.000 caracteres por operación individual</strong> (sujeto al saldo de su plan).</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>29. ¿Qué ventajas ofrece la función de Agente en Google Flow frente a la generación individual?</summary>
+        <div class="qa-body"><p>Permite enviar múltiples prompts de escenas de una sola vez (<em>batch processing</em>), generando 3 vídeos en paralelo bajo la misma configuración de aspecto (<code>16:9 * 1</code>), modelo (<code>OVNI 11 Flash</code>) y referencia de personaje.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>30. ¿Qué estructura de datos entrega Kimi al solicitar la planificación de un mini drama?</summary>
+        <div class="qa-body"><p>Entrega cuatro bloques técnicos de preproducción: 1) El guion completo del primer episodio, 2) El <em>storyboard</em> o escaleta visual, 3) La lista detallada de planos (<em>shot list</em>) y 4) El orden técnico de rodaje.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>31. ¿Cómo se optimiza el flujo de trabajo entre Gemini y Google Flow al manejar el Prompt 3?</summary>
+        <div class="qa-body"><p>Adjuntando directamente la imagen de la Hoja de Personaje descargada a 1K dentro del chat de Gemini mediante el botón <code>+</code> al enviar el Prompt 3. Así Gemini inspecciona visualmente tu monigote y redacta los prompts de animación en inglés describiendo exactamente esos mismos rasgos.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>32. ¿Qué técnica de montaje garantiza una alta retención (watch time) en canales de monigotes?</summary>
+        <div class="qa-body"><p>Combinar un gancho potente en los primeros 3 segundos con recortes dinámicos en CapCut, eliminando silencios muertos, sincronizando la velocidad de cada clip con la locución, alternando planos (generales, medios y primeros planos) e insertando transiciones suaves.</p></div>
+      </details>
+
+      <details class="qa-item">
+        <summary>33. ¿Es posible automatizar la creación de guiones y audios mediante la API de Luvvoice?</summary>
+        <div class="qa-body"><p>Sí. Luvvoice dispone de documentación oficial de <strong>API para desarrolladores</strong> (<code>https://luvvoice.com/es/doc</code>), así como soporte para <strong>Servidor MCP</strong> (<code>/es/mcp</code>) y <strong>AI Skill</strong> (<code>/es/skill</code>) para integrar la síntesis de voz en flujos automatizados externos.</p></div>
+      </details>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="4">⬅ Anterior: PROMPTS</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="6">Siguiente: 6. ERRORES ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 6: ERRORES Y RESOLUCIÓN DE PROBLEMAS
+       ===================================================================== -->
+  <section class="tab-section" id="sec-errores" data-t="ERRORES">
+    <h2 class="section-main-title">6. Resolución de Problemas, Errores Comunes y Limitaciones del Plan Gratuito</h2>
+
+    <div class="card">
+      <h3>6.1. Diagnóstico y Solución a los 4 Problemas Técnicos Principales</h3>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">!</span><h4>Problema 1: El monigote cambia de cara, ropa o estilo en una escena compleja</h4></div>
+        <p><strong>Causa:</strong> Cuando un prompt de escena describe muchos elementos de fondo o acciones complejas, el modelo de vídeo puede relajar la referencia de la imagen adjunta.</p>
+        <p><strong>Solución verificada:</strong> Asegúrate de haber arrastrado la Hoja de Personaje a 1K a la caja de Google Flow y escribe explícitamente dentro del prompt de esa escena <code>personaje @[Hoja_de_Personaje]</code> seleccionando la miniatura emergente. Esto fuerza el condicionamiento visual en el modelo <strong>OVNI 11 Flash</strong>.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">!</span><h4>Problema 2: Bloqueo por agotamiento de los 50 créditos diarios en Google Flow</h4></div>
+        <p><strong>Causa:</strong> Google Flow otorga 50 créditos gratuitos cada 24 horas y cada lote de 3 escenas consume 45 créditos (quedando 5 créditos, insuficientes para otro vídeo).</p>
+        <p><strong>Solución verificada (Rotación Multicuenta):</strong> Cierra sesión o abre una ventana en modo incógnito, entra en Google Flow con una segunda cuenta de Gmail, sube la misma Hoja de Personaje a 1K guardada en tu dispositivo y genera el siguiente lote de 3 escenas inmediatamente.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">!</span><h4>Problema 3: Error «Algo salió mal» (Something went wrong) en Luvvoice</h4></div>
+        <p><strong>Causa:</strong> Extensiones del navegador, bloqueadores agresivos o plugins de traducción automática que modifican el código HTML en vivo e interrumpen las llamadas AJAX de síntesis de voz.</p>
+        <p><strong>Solución verificada:</strong> Desactiva el traductor automático de páginas y las extensiones en <code>luvvoice.com</code>, pulsa <code>F5</code> para recargar y vuelve a generar el audio. Además, no insertes más de 20 pausas por conversión.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-number">!</span><h4>Problema 4: Fallo al extraer texto desde un archivo PDF en Luvvoice</h4></div>
+        <p><strong>Causa:</strong> El archivo PDF subido es un documento escaneado compuesto por imágenes planas sin capa de texto OCR.</p>
+        <p><strong>Solución verificada:</strong> Utiliza documentos PDF nativos donde el texto se pueda seleccionar con el cursor, archivos <code>.txt</code> o pega directamente el guion en la caja de texto de Luvvoice.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>6.2. Tabla Resumen de Limitaciones del Plan Gratuito y Mitigación</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Plataforma / Recurso</th>
+              <th>Límite Técnico Documentado</th>
+              <th>Estrategia de Mitigación sin Coste</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Google Flow (Créditos)</strong></td>
+              <td>50 créditos/día por cuenta (~3 vídeos a 45 créditos/lote).</td>
+              <td>Rotación multicuenta con varias cuentas de Gmail conservando la misma Hoja de Personaje a 1K.</td>
+            </tr>
+            <tr>
+              <td><strong>Google Flow (Resolución Vídeo)</strong></td>
+              <td>Exportación máxima en plan gratuito limitada a <strong>720p</strong>.</td>
+              <td>Importar los clips 720p en CapCut y exportar el proyecto final reescalado en contenedor <strong>1080p Full HD</strong>.</td>
+            </tr>
+            <tr>
+              <td><strong>Luvvoice (Cuota Mensual)</strong></td>
+              <td><strong>10.000 caracteres/mes</strong> gratis para usuarios registrados.</td>
+              <td>Ajustar guiones (un vídeo de 1 min tiene ~150 palabras / ~900 caracteres, permitiendo ~10 vídeos/mes por cuenta) o alternar cuentas de Google.</td>
+            </tr>
+            <tr>
+              <td><strong>Luvvoice (Pausas Técnicas)</strong></td>
+              <td>Máximo recomendado de <strong>20 pausas</strong> por bloque de conversión.</td>
+              <td>Colocar pausas solo en transiciones clave o dividir guiones de 20 minutos en bloques separados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="5">⬅ Anterior: 33 Preguntas (Q&amp;A)</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="7">Siguiente: 7. RESUMEN ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 7: RESUMEN Y DECÁLOGO
+       ===================================================================== -->
+  <section class="tab-section" id="sec-resumen" data-t="RESUMEN">
+    <h2 class="section-main-title">7. Resumen Ejecutivo, Decálogo de Buenas Prácticas y Checklist Interactivo</h2>
+
+    <div class="card">
+      <h3>7.1. Decálogo de Buenas Prácticas para Vídeos Virales de Monigotes</h3>
+      <ol>
+        <li><strong>Gancho en los primeros 3 segundos:</strong> Inicia siempre el vídeo con un dilema límite o pregunta fascinante extraída de la Fase 3 del Prompt 1.</li>
+        <li><strong>Protagonista único:</strong> Diseña las historias alrededor de un solo personaje central para maximizar la consistencia visual y simplificar la producción.</li>
+        <li><strong>Hoja de Personaje siempre a 1K:</strong> No animes ninguna escena sin haber descargado primero tu planilla maestra a 1K con <strong>Nano Banana Pro</strong>.</li>
+        <li><strong>Anclaje doble en Google Flow:</strong> Arrastra siempre la planilla a la barra de entrada y utiliza <code>personaje @[planilla]</code> ante cualquier rebeldía del modelo.</li>
+        <li><strong>Respiración natural en TTS:</strong> Inserta pausas de <code>0.5s</code> a <code>1.0s</code> en Luvvoice para evitar una locución robótica o atropellada.</li>
+        <li><strong>Variedad de planos cinematográficos:</strong> Verifica que los prompts del Prompt 3 alternen planos generales (<em>wide shots</em>), planos medios y primeros planos.</li>
+        <li><strong>Sincronización elástica en CapCut:</strong> Ajusta la velocidad (<em>Speed</em>) de cada clip animado para que los cortes visuales acompañen exactamente el ritmo de la voz.</li>
+        <li><strong>Nomenclatura ordenada de archivos:</strong> Guarda tus descargas con nombres secuenciales claros (<code>escena_01.mp4</code>, <code>escena_02.mp4</code>) antes de ir a CapCut.</li>
+        <li><strong>Vigilancia de créditos antes de enviar:</strong> Revisa tu contador de puntos en Google Flow antes de lanzar un lote de 45 créditos.</li>
+        <li><strong>Navegador limpio en Luvvoice:</strong> Mantén desactivados los plugins de traducción automática mientras generas el archivo MP3.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>7.2. Lista de Comprobación Interactiva de Producción (Progreso Guardado)</h3>
+      <p>Marca cada paso a medida que produces tu vídeo. Tu progreso se conserva automáticamente en tu navegador:</p>
+
+      <div id="checklist-container">
+        <label class="checklist-item"><input type="checkbox" data-check-id="chk-1"><span><strong>Paso 1 (Gemini - Prompt 1):</strong> He elegido el tema entre las 10 ideas, seleccionado la duración (ej. 1 min) y copiado el guion final sin marcas de tiempo.</span></label>
+        <label class="checklist-item"><input type="checkbox" data-check-id="chk-2"><span><strong>Paso 2 (Gemini - Prompt 2):</strong> He abierto un chat nuevo, pegado el guion dentro de los corchetes y obtenido las 3 opciones de prompt en inglés para la Hoja de Personaje.</span></label>
+        <label class="checklist-item"><input type="checkbox" data-check-id="chk-3"><span><strong>Paso 3 (Google Flow - Nano Banana Pro):</strong> He configurado Imagen, 16:9, Nano Banana Pro, x1, generado las 3 planillas y descargado la mejor en resolución <strong>1K</strong>.</span></label>
+        <label class="checklist-item"><input type="checkbox" data-check-id="chk-4"><span><strong>Paso 4 (Gemini - Prompt 3):</strong> He abierto un tercer chat nuevo, subido con el botón <code>+</code> la planilla 1K junto al guion y obtenido el desglose de escenas.</span></label>
+        <label class="checklist-item"><input type="checkbox" data-check-id="chk-5"><span><strong>Paso 5 (Google Flow - OVNI 11 Flash):</strong> He activado el modo Agente (<code>16:9 * 1</code>, <code>OVNI 11 Flash</code>), arrastrado la planilla 1K, generado los lotes de 3 vídeos (45 créditos) y descargado los clips en <strong>720p</strong>.</span></label>
+        <label class="checklist-item"><input type="checkbox" data-check-id="chk-6"><span><strong>Paso 6 (Luvvoice / Loop Boys):</strong> He iniciado sesión, pegado el guion en Español de España, añadido pausas estratégicas (&lt;20) y descargado la locución en <strong>MP3</strong>.</span></label>
+        <label class="checklist-item"><input type="checkbox" data-check-id="chk-7"><span><strong>Paso 7 (CapCut Final):</strong> He sincronizado los clips 720p con el audio MP3 ajustando la velocidad (<em>Speed</em>), añadido transiciones y exportado el vídeo MP4.</span></label>
+      </div>
+      <div style="margin-top:10px;">
+        <button type="button" class="copy-btn" id="btn-reset-checklist">Reiniciar lista de comprobación</button>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="6">⬅ Anterior: ERRORES</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="8">Siguiente: 8. FUENTES ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 8: FUENTES FIABLES Y DOCUMENTACIÓN OFICIAL
+       ===================================================================== -->
+  <section class="tab-section" id="sec-fuentes" data-t="FUENTES">
+    <h2 class="section-main-title">8. Fuentes Fiables, Enlaces Oficiales y Documentación Técnica</h2>
+    <p>Todas las URLs y referencias documentales empleadas en este manual son 100% fieles al material fuente y cuentan con botón de copia directa para que puedas utilizarlas externamente sin errores.</p>
+
+    <div class="card">
+      <h3>8.1. Canal Instruccional y Fuente Audiovisual de Referencia</h3>
+      <ul>
+        <li><strong>Título del Tutorial Original:</strong> «Crea Vídeos de Animaciones Virales con IA (Gratis) - Tutorial completo»</li>
+        <li><strong>Creador / Canal de YouTube:</strong> Joaquín Barberá - Inteligencia Artificial</li>
+        <li><strong>Autor de la metodología sistematizada:</strong> Rubén Sbarsky</li>
+      </ul>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>URL Directa al Vídeo Tutorial en YouTube</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">https://youtube.com/watch?v=VjvR8yBMjXI&is=Ht7a5RSxX0oV-cBZ</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>8.2. Plataforma Oficial de Síntesis de Voz Luvvoice / Loop Boys y API</h3>
+      <p>Enlaces oficiales en español para el generador Texto a Voz (TTS), biblioteca de voces, documentación de API, Servidor MCP, AI Skill y textos legales/GDPR:</p>
+      <div class="code-container">
+        <div class="code-toolbar">
+          <span>Directorio Completo de URLs Oficiales de Luvvoice (Español)</span>
+          <button type="button" class="copy-btn">COPIAR</button>
+        </div>
+        <pre class="code-block">https://luvvoice.com/es
+https://luvvoice.com/es/library
+https://luvvoice.com/es/doc
+https://luvvoice.com/es/mcp
+https://luvvoice.com/es/skill
+https://luvvoice.com/es/terms-of-service
+https://luvvoice.com/es/privacy-policy</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>8.3. Plataformas de Generación IA, Edición y Prototipado</h3>
+      <ul>
+        <li><strong>Google Gemini:</strong> Entorno oficial de Google para la generación de guiones en 3 fases e ingeniería de prompts (Prompts 1, 2 y 3).</li>
+        <li><strong>Google Flow:</strong> Entorno de renderizado de hojas de personaje (modelo <strong>Nano Banana Pro</strong> a 1K) y animación en lote (modelo <strong>OVNI 11 Flash</strong> a 720p).</li>
+        <li><strong>CapCut:</strong> Suite de edición de vídeo multipista, ajuste de velocidad (<em>Speed</em>) y exportación MP4.</li>
+        <li><strong>Kimi (Moonshot AI K31):</strong> Plataforma de prototipado rápido de videojuegos 3D interactivos y planificación técnica de <em>storyboards</em> y rodaje para mini dramas.</li>
+      </ul>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="7">⬅ Anterior: RESUMEN</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="9">Siguiente: 9. CRÉDITOS ➔</button>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PESTAÑA 9: CRÉDITOS (ORDEN ESTRICTO OBLIGATORIO)
+       ===================================================================== -->
+  <section class="tab-section" id="sec-creditos" data-t="CRÉDITOS">
+    <!-- 1. Título de la sección -->
+    <h2 class="section-main-title">9. CRÉDITOS</h2>
+
+    <!-- 2. SVG animado compartido con INICIO (visible en primera pantalla móvil) -->
+    <div class="svg-hero-wrapper" role="img" aria-label="Ilustración vectorial animada compartida con INICIO: matriz de producción de vídeos virales de monigotes (Stickman) con Inteligencia Artificial gratuita, integrando Google Gemini, Google Flow (Nano Banana Pro y OVNI 11 Flash), Luvvoice TTS y CapCut.">
+      <div class="svg-mount-node" id="svg-mount-creditos"></div>
+    </div>
+
+    <div class="svg-controls-bar">
+      <button type="button" class="chip" id="btn-toggle-svg-creditos" aria-label="Pausar o reanudar animación en créditos">⏸ Pausar animación</button>
+    </div>
+
+    <div class="card">
+      <!-- 3. Breve descripción de la ilustración -->
+      <p style="text-align:center; color:var(--text-muted); font-size:0.92rem;">
+        <strong>Descripción de la ilustración animada:</strong> Escena vectorial multicapa en formato vertical 4:5 que representa el ecosistema completo de producción de animaciones virales <em>Stickman</em> con IA gratuita. En el núcleo destaca la Hoja de Personaje (<em>Character Sheet</em> a 1K con anclaje <code>personaje @[planilla]</code>) conectada mediante flujos de datos dinámicos a los 4 motores del flujo (Google Gemini, Google Flow con OVNI 11 Flash, Luvvoice MP3 y CapCut + Kimi K31) sobre una línea de tiempo sincronizada.
+      </p>
+
+      <!-- 4. Nombre del autor (elemento visual más destacado) -->
+      <div class="author-spotlight">Rubén Sbarsky</div>
+
+      <!-- 5. Texto «Autor del tutorial» -->
+      <div class="author-role">Autor del tutorial</div>
+
+      <!-- 6. Información adicional pertinente -->
+      <hr style="border:none; border-top:1px solid var(--border-color); margin:14px 0;">
+      <p><strong>Información de Producción y Estándares de Ingeniería:</strong></p>
+      <ul>
+        <li><strong>Metodología pedagógica y auditoría:</strong> Construido bajo especificación <em>GAUNTLET V3</em> y estándares de arquitectura <em>Clean Code</em> (nombres reveladores de intención, funciones enfocadas de responsabilidad única y gestión defensiva de errores).</li>
+        <li><strong>Optimización de dispositivo móvil:</strong> Diseño responsivo calibrado específicamente para pantallas de <strong>360 px de ancho (Samsung Galaxy A02s)</strong> con objetivos táctiles superiores a 44 px y cero desbordes horizontales.</li>
+        <li><strong>Fecha y hora fija de creación y sincronización:</strong> <strong>03/11/2026 — 21:25:44</strong></li>
+      </ul>
+
+      <!-- 7. Número de versión coincidente con el nombre del archivo -->
+      <p style="text-align:center; margin-top:14px; font-weight:800; color:var(--accent);">
+        Versión del entregable: <code>V001</code> (Archivo: <code>tutorial_videos_ia_monigotes_V001.html</code>)
+      </p>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="nav-step-btn" data-goto="8">⬅ Anterior: 8. FUENTES</button>
+      <button type="button" class="nav-step-btn next-btn" data-goto="0">🏠 Volver a INICIO</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- BOTONES FLOTANTES ARRASTRABLES (MOVIBLES EN PANTALLA TÁCTIL Y RATÓN) -->
+<button type="button" id="fab-home" class="floating-draggable-btn" title="Ir a la pestaña INICIO (Puedes arrastrar este botón)" aria-label="Ir a la pestaña INICIO">
+  <span class="icon">🏠</span>
+  <span>INICIO</span>
+</button>
+
+<button type="button" id="fab-top" class="floating-draggable-btn" title="Subir al comienzo de la pestaña actual (Puedes arrastrar este botón)" aria-label="Subir al comienzo de la pestaña actual">
+  <span class="icon">⬆</span>
+  <span>ARRIBA</span>
+</button>
+
+<!-- NOTIFICACIÓN ACCESIBLE (TOAST) -->
+<div id="toast-msg" role="status" aria-live="polite"></div>
+
+<!-- =========================================================================
+     JAVASCRIPT LIMPIO (CLEAN CODE ARCHITECTURE - SIN DEPENDENCIAS EXTERNAS)
+     ========================================================================= -->
+<script>
+(function () {
+  "use strict";
+
+  const STORAGE_KEY_PREFIX = "stickman_ia_v001_";
+  const secs = Array.from(document.querySelectorAll(".tab-section"));
+  const tabChips = Array.from(document.querySelectorAll(".nav-tab-chip"));
+  const dr = document.querySelector("#dr");
+  const mb = document.querySelector("#mb");
+  const homeIndexBtn = document.querySelector("#ix");
+
+  let activeSectionIndex = 0;
+  let masterSvgMarkup = "";
+  let isSvgAnimationPaused = false;
+  let closedDetailsBeforePrint = [];
+
+  /* =========================================================================
+     1. ALMACENAMIENTO SEGURO (PERSISTENCIA CON MANEJO DEFENSIVO DE ERRORES)
+     ========================================================================= */
+  function readStorageItem(key, fallbackValue) {
+    try {
+      const value = window.localStorage.getItem(STORAGE_KEY_PREFIX + key);
+      return value !== null ? value : fallbackValue;
+    } catch (_storageError) {
+      return fallbackValue;
+    }
+  }
+
+  function writeStorageItem(key, value) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY_PREFIX + key, String(value));
+    } catch (_storageError) {
+      /* Entorno con localStorage restringido: el tutorial continúa operativo */
+    }
+  }
+
+  /* =========================================================================
+     2. NOTIFICACIONES VISUALES (TOAST)
+     ========================================================================= */
+  let toastTimeoutId = null;
+  function showToastNotification(messageText) {
+    const toastElement = document.getElementById("toast-msg");
+    if (!toastElement) return;
+    toastElement.textContent = messageText;
+    toastElement.classList.add("show");
+    if (toastTimeoutId) clearTimeout(toastTimeoutId);
+    toastTimeoutId = setTimeout(function () {
+      toastElement.classList.remove("show");
+    }, 2600);
+  }
+
+  /* =========================================================================
+     3. MOTOR DE PLANTILLA ÚNICA SVG COMPARTIDA (INICIO Y CRÉDITOS)
+     ========================================================================= */
+  function extractAndRemoveHiddenSvgTemplate() {
+    const sourceSvgElement = document.getElementById("master-svg-source");
+    if (!sourceSvgElement) return;
+    sourceSvgElement.removeAttribute("id");
+    sourceSvgElement.removeAttribute("style");
+    masterSvgMarkup = sourceSvgElement.outerHTML;
+    sourceSvgElement.remove();
+  }
+
+  function buildUniqueSvgMarkup(instanceSuffix) {
+    if (!masterSvgMarkup) return "";
+    return masterSvgMarkup.replace(/__UID__/g, "_" + instanceSuffix);
+  }
+
+  function applyFallbackDataImageIfBroken(mountNode, uniqueSvgString) {
+    try {
+      const encodedSvg = "data:image/svg+xml;utf8," + encodeURIComponent(uniqueSvgString);
+      const fallbackImg = document.createElement("img");
+      fallbackImg.src = encodedSvg;
+      fallbackImg.alt = "Ilustración del flujo de creación de vídeos de animación Stickman con IA";
+      fallbackImg.style.width = "100%";
+      fallbackImg.style.height = "100%";
+      mountNode.innerHTML = "";
+      mountNode.appendChild(fallbackImg);
+    } catch (_fallbackError) {
+      /* Conserva estado seguro si falla la codificación URI */
+    }
+  }
+
+  function mountSvgInstance(containerId, instanceSuffix) {
+    const mountNode = document.getElementById(containerId);
+    if (!mountNode || !masterSvgMarkup) return;
+    const uniqueSvgString = buildUniqueSvgMarkup(instanceSuffix);
+    mountNode.innerHTML = uniqueSvgString;
+    const renderedSvg = mountNode.querySelector("svg");
+    if (!renderedSvg) {
+      applyFallbackDataImageIfBroken(mountNode, uniqueSvgString);
+      return;
+    }
+    mountNode.classList.toggle("svg-paused", isSvgAnimationPaused);
+  }
+
+  function mountAllSvgInstances() {
+    mountSvgInstance("svg-mount-home", "home");
+    mountSvgInstance("svg-mount-creditos", "creditos");
+  }
+
+  function repairVisibleEmptySvgContainers() {
+    const homeMount = document.getElementById("svg-mount-home");
+    if (homeMount && homeMount.innerHTML.trim() === "") {
+      mountSvgInstance("svg-mount-home", "home");
+    }
+    const creditosMount = document.getElementById("svg-mount-creditos");
+    if (creditosMount && creditosMount.innerHTML.trim() === "") {
+      mountSvgInstance("svg-mount-creditos", "creditos");
+    }
+  }
+
+  function toggleSvgAnimationState() {
+    isSvgAnimationPaused = !isSvgAnimationPaused;
+    const mounts = document.querySelectorAll(".svg-mount-node");
+    mounts.forEach(function (node) {
+      node.classList.toggle("svg-paused", isSvgAnimationPaused);
+    });
+    const label = isSvgAnimationPaused ? "▶ Reanudar animación" : "⏸ Pausar animación";
+    const btnHome = document.getElementById("btn-toggle-svg-home");
+    const btnCred = document.getElementById("btn-toggle-svg-creditos");
+    if (btnHome) btnHome.textContent = label;
+    if (btnCred) btnCred.textContent = label;
+  }
+
+  /* =========================================================================
+     4. NAVEGACIÓN SPA DE PESTAÑAS E ÍNDICE LATERAL DESLIZABLE (#dr y #mb)
+     ========================================================================= */
+  const tg = function (forceState) {
+    if (!dr || !mb) return;
+    dr.classList.toggle("o", forceState);
+    mb.setAttribute("aria-expanded", dr.classList.contains("o"));
+  };
+
+  function scrollCurrentTabToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function go(targetIndex) {
+    const safeIndex = Math.max(0, Math.min(secs.length - 1, Number(targetIndex) || 0));
+    activeSectionIndex = safeIndex;
+
+    secs.forEach(function (sectionEl, idx) {
+      sectionEl.classList.toggle("active-section", idx === safeIndex);
+    });
+
+    tabChips.forEach(function (chipEl, idx) {
+      const isCurrent = idx === safeIndex;
+      chipEl.classList.toggle("active-chip", isCurrent);
+      if (isCurrent) {
+        chipEl.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      }
+    });
+
+    if (dr) {
+      [...dr.children].forEach(function (a, j) {
+        a.classList.toggle("on", j == safeIndex);
+      });
+    }
+
+    if (safeIndex === 0) {
+      mountSvgInstance("svg-mount-home", "home");
+    } else if (safeIndex === secs.length - 1) {
+      mountSvgInstance("svg-mount-creditos", "creditos");
+    }
+
+    writeStorageItem("active_tab", safeIndex);
+    scrollCurrentTabToTop();
+    updateReadingProgressBar();
+  }
+
+  function initializeIndexDrawerAndTabs() {
+    if (dr) {
+      dr.innerHTML = "";
+      secs.forEach(function (s, i) {
+        const a = document.createElement("a");
+        const headingEl = s.querySelector("h2");
+        a.textContent = (i ? i + ". " : "") + (s.dataset.t || (headingEl ? headingEl.textContent : "Sección " + i));
+        a.onclick = function () {
+          go(i);
+          tg(false);
+        };
+        dr.appendChild(a);
+      });
+    }
+
+    if (mb) {
+      mb.onclick = function () {
+        tg();
+      };
+    }
+
+    if (homeIndexBtn) {
+      homeIndexBtn.onclick = function () {
+        tg(true);
+      };
+    }
+
+    addEventListener("keydown", function (e) {
+      if (e.key === "Escape") tg(false);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest("#dr,#mb,#ix")) tg(false);
+    });
+
+    tabChips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        const index = Number(chip.getAttribute("data-index"));
+        go(index);
+      });
+    });
+
+    const stepButtons = document.querySelectorAll(".nav-step-btn[data-goto]");
+    stepButtons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const target = Number(btn.getAttribute("data-goto"));
+        go(target);
+      });
+    });
+  }
+
+  /* =========================================================================
+     5. BOTONES FLOTANTES ARRASTRABLES (INICIO Y ARRIBA)
+     ========================================================================= */
+  function makeButtonDraggableAndClickable(buttonElement, onClickAction, storagePosKey) {
+    if (!buttonElement) return;
+    let isDragging = false;
+    let hasMoved = false;
+    let startX = 0;
+    let startY = 0;
+    let initialLeft = 0;
+    let initialTop = 0;
+
+    const savedPosRaw = readStorageItem(storagePosKey, "");
+    if (savedPosRaw) {
+      try {
+        const parsedPos = JSON.parse(savedPosRaw);
+        if (typeof parsedPos.left === "number" && typeof parsedPos.top === "number") {
+          buttonElement.style.right = "auto";
+          buttonElement.style.bottom = "auto";
+          buttonElement.style.left = Math.max(4, Math.min(window.innerWidth - 58, parsedPos.left)) + "px";
+          buttonElement.style.top = Math.max(62, Math.min(window.innerHeight - 58, parsedPos.top)) + "px";
+        }
+      } catch (_jsonErr) {}
+    }
+
+    buttonElement.addEventListener("pointerdown", function (event) {
+      isDragging = true;
+      hasMoved = false;
+      startX = event.clientX;
+      startY = event.clientY;
+      const rect = buttonElement.getBoundingClientRect();
+      initialLeft = rect.left;
+      initialTop = rect.top;
+      buttonElement.setPointerCapture(event.pointerId);
+    });
+
+    buttonElement.addEventListener("pointermove", function (event) {
+      if (!isDragging) return;
+      const deltaX = event.clientX - startX;
+      const deltaY = event.clientY - startY;
+      if (Math.abs(deltaX) > 6 || Math.abs(deltaY) > 6) {
+        hasMoved = true;
+      }
+      if (!hasMoved) return;
+      const clampedLeft = Math.max(4, Math.min(window.innerWidth - buttonElement.offsetWidth - 4, initialLeft + deltaX));
+      const clampedTop = Math.max(60, Math.min(window.innerHeight - buttonElement.offsetHeight - 4, initialTop + deltaY));
+      buttonElement.style.right = "auto";
+      buttonElement.style.bottom = "auto";
+      buttonElement.style.left = clampedLeft + "px";
+      buttonElement.style.top = clampedTop + "px";
+    });
+
+    buttonElement.addEventListener("pointerup", function (event) {
+      if (!isDragging) return;
+      isDragging = false;
+      buttonElement.releasePointerCapture(event.pointerId);
+      if (hasMoved) {
+        const rect = buttonElement.getBoundingClientRect();
+        writeStorageItem(storagePosKey, JSON.stringify({ left: Math.round(rect.left), top: Math.round(rect.top) }));
+      } else {
+        onClickAction();
+      }
+    });
+  }
+
+  /* =========================================================================
+     6. COPIA ÍNTEGRA DE PROMPTS, CÓDIGO Y ENLACES AL PORTAPAPELES
+     ========================================================================= */
+  function fallbackCopyTextToClipboard(rawText) {
+    const tempTextArea = document.createElement("textarea");
+    tempTextArea.value = rawText;
+    tempTextArea.setAttribute("readonly", "");
+    tempTextArea.style.position = "fixed";
+    tempTextArea.style.top = "-9999px";
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    let succeeded = false;
+    try {
+      succeeded = document.execCommand("copy");
+    } catch (_execErr) {
+      succeeded = false;
+    }
+    document.body.removeChild(tempTextArea);
+    return succeeded;
+  }
+
+  function handleCopyButtonClick(buttonEl) {
+    const container = buttonEl.closest(".code-container");
+    if (!container) return;
+    const preElement = container.querySelector("pre.code-block");
+    if (!preElement) return;
+    const exactText = preElement.textContent;
+
+    const confirmCopiedVisual = function () {
+      const originalLabel = buttonEl.textContent;
+      buttonEl.textContent = "✓ COPIADO";
+      showToastNotification("Contenido copiado íntegramente al portapapeles");
+      setTimeout(function () {
+        buttonEl.textContent = originalLabel;
+      }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(exactText).then(confirmCopiedVisual).catch(function () {
+        if (fallbackCopyTextToClipboard(exactText)) {
+          confirmCopiedVisual();
+        } else {
+          showToastNotification("Selecciona el texto del bloque y pulsa Ctrl+C / Copiar");
+        }
+      });
+    } else if (fallbackCopyTextToClipboard(exactText)) {
+      confirmCopiedVisual();
+    } else {
+      showToastNotification("Selecciona el texto del bloque y pulsa Ctrl+C / Copiar");
+    }
+  }
+
+  /* =========================================================================
+     7. BUSCADOR INTERNO MULTIPESTAÑA, TAMAÑO DE FUENTE Y TEMA CLARO/OSCURO
+     ========================================================================= */
+  function initializeSearchAndUtilities() {
+    const searchInput = document.getElementById("global-search");
+    const clearBtn = document.getElementById("clear-search");
+
+    if (searchInput && clearBtn) {
+      searchInput.addEventListener("input", function () {
+        const query = searchInput.value.trim().toLowerCase();
+        clearBtn.style.display = query.length > 0 ? "block" : "none";
+        if (query.length < 2) return;
+
+        for (let i = 0; i < secs.length; i++) {
+          const sectionText = secs[i].textContent.toLowerCase();
+          if (sectionText.includes(query)) {
+            if (activeSectionIndex !== i) {
+              go(i);
+            }
+            const detailsInTab = secs[i].querySelectorAll("details.qa-item");
+            detailsInTab.forEach(function (d) {
+              if (d.textContent.toLowerCase().includes(query)) {
+                d.open = true;
+              }
+            });
+            break;
+          }
+        }
+      });
+
+      clearBtn.addEventListener("click", function () {
+        searchInput.value = "";
+        clearBtn.style.display = "none";
+        searchInput.focus();
+      });
+    }
+
+    /* Tamaño de letra */
+    let currentFontScale = parseFloat(readStorageItem("font_scale", "1")) || 1;
+    function applyFontScale(scale) {
+      currentFontScale = Math.max(0.85, Math.min(1.3, Number(scale.toFixed(2))));
+      document.documentElement.style.setProperty("--font-scale", String(currentFontScale));
+      writeStorageItem("font_scale", currentFontScale);
+    }
+    applyFontScale(currentFontScale);
+
+    const btnFontDown = document.getElementById("btn-font-down");
+    const btnFontUp = document.getElementById("btn-font-up");
+    if (btnFontDown) {
+      btnFontDown.addEventListener("click", function () {
+        applyFontScale(currentFontScale - 0.08);
+        showToastNotification("Tamaño de texto reducido");
+      });
+    }
+    if (btnFontUp) {
+      btnFontUp.addEventListener("click", function () {
+        applyFontScale(currentFontScale + 0.08);
+        showToastNotification("Tamaño de texto aumentado");
+      });
+    }
+
+    /* Tema claro / oscuro */
+    const savedTheme = readStorageItem("theme", "dark");
+    if (savedTheme === "light") {
+      document.body.classList.add("light-theme");
+    }
+    const btnTheme = document.getElementById("btn-theme");
+    if (btnTheme) {
+      btnTheme.addEventListener("click", function () {
+        const isLight = document.body.classList.toggle("light-theme");
+        writeStorageItem("theme", isLight ? "light" : "dark");
+        showToastNotification(isLight ? "Tema claro activado" : "Tema oscuro activado");
+      });
+    }
+
+    /* Desplegar / plegar las 33 Q&A */
+    const btnExpandQa = document.getElementById("btn-expand-all-qa");
+    const btnCollapseQa = document.getElementById("btn-collapse-all-qa");
+    if (btnExpandQa) {
+      btnExpandQa.addEventListener("click", function () {
+        document.querySelectorAll("#sec-qa details.qa-item").forEach(function (d) { d.open = true; });
+      });
+    }
+    if (btnCollapseQa) {
+      btnCollapseQa.addEventListener("click", function () {
+        document.querySelectorAll("#sec-qa details.qa-item").forEach(function (d) { d.open = false; });
+      });
+    }
+  }
+
+  /* =========================================================================
+     8. CHECKLIST INTERACTIVO CON PERSISTENCIA Y BARRA DE PROGRESO
+     ========================================================================= */
+  function initializeChecklistAndProgress() {
+    const checkboxes = document.querySelectorAll("#checklist-container input[type='checkbox']");
+    checkboxes.forEach(function (box) {
+      const checkId = box.getAttribute("data-check-id");
+      const savedState = readStorageItem("chk_" + checkId, "0") === "1";
+      box.checked = savedState;
+      const parentItem = box.closest(".checklist-item");
+      if (parentItem) parentItem.classList.toggle("checked", savedState);
+
+      box.addEventListener("change", function () {
+        writeStorageItem("chk_" + checkId, box.checked ? "1" : "0");
+        if (parentItem) parentItem.classList.toggle("checked", box.checked);
+      });
+    });
+
+    const resetBtn = document.getElementById("btn-reset-checklist");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        checkboxes.forEach(function (box) {
+          const checkId = box.getAttribute("data-check-id");
+          box.checked = false;
+          writeStorageItem("chk_" + checkId, "0");
+          const parentItem = box.closest(".checklist-item");
+          if (parentItem) parentItem.classList.remove("checked");
+        });
+        showToastNotification("Lista de comprobación reiniciada");
+      });
+    }
+  }
+
+  function updateReadingProgressBar() {
+    const progressBar = document.getElementById("reading-progress-bar");
+    if (!progressBar) return;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrollPercent = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 100;
+    progressBar.style.width = scrollPercent + "%";
+  }
+
+  /* =========================================================================
+     9. PREPARACIÓN Y RESTAURACIÓN PARA IMPRESIÓN Y EXPORTACIÓN PDF A4
+     ========================================================================= */
+  function prepareDocumentBeforePrint() {
+    mountAllSvgInstances();
+    closedDetailsBeforePrint = [];
+    const allDetails = document.querySelectorAll("details.qa-item");
+    allDetails.forEach(function (detailEl) {
+      if (!detailEl.open) {
+        closedDetailsBeforePrint.push(detailEl);
+        detailEl.open = true;
+      }
+    });
+  }
+
+  function restoreDocumentAfterPrint() {
+    closedDetailsBeforePrint.forEach(function (detailEl) {
+      detailEl.open = false;
+    });
+    closedDetailsBeforePrint = [];
+  }
+
+  function triggerPrintOrPdf() {
+    prepareDocumentBeforePrint();
+    try {
+      window.print();
+    } catch (_printError) {
+      showToastNotification("Abre este archivo directamente en el navegador y utiliza Ctrl+P o Cmd+P");
+    } finally {
+      setTimeout(restoreDocumentAfterPrint, 900);
+    }
+  }
+
+  /* =========================================================================
+     10. INICIALIZACIÓN PRINCIPAL AL CARGAR EL DOCUMENTO
+     ========================================================================= */
+  function initializeTutorialApp() {
+    extractAndRemoveHiddenSvgTemplate();
+    mountAllSvgInstances();
+    initializeIndexDrawerAndTabs();
+    initializeSearchAndUtilities();
+    initializeChecklistAndProgress();
+
+    /* Eventos de botones COPIAR */
+    document.querySelectorAll(".copy-btn").forEach(function (btn) {
+      if (btn.id === "btn-reset-checklist") return;
+      btn.addEventListener("click", function () {
+        handleCopyButtonClick(btn);
+      });
+    });
+
+    /* Botones de pausa/reanudación del SVG */
+    const btnSvgHome = document.getElementById("btn-toggle-svg-home");
+    const btnSvgCred = document.getElementById("btn-toggle-svg-creditos");
+    if (btnSvgHome) btnSvgHome.addEventListener("click", toggleSvgAnimationState);
+    if (btnSvgCred) btnSvgCred.addEventListener("click", toggleSvgAnimationState);
+
+    /* Botón de impresión PDF */
+    const btnPrint = document.getElementById("btn-print");
+    if (btnPrint) btnPrint.addEventListener("click", triggerPrintOrPdf);
+    window.addEventListener("beforeprint", prepareDocumentBeforePrint);
+    window.addEventListener("afterprint", restoreDocumentAfterPrint);
+
+    /* Botones flotantes arrastrables: INICIO y ARRIBA */
+    makeButtonDraggableAndClickable(
+      document.getElementById("fab-home"),
+      function () { go(0); },
+      "fab_home_pos"
+    );
+    makeButtonDraggableAndClickable(
+      document.getElementById("fab-top"),
+      function () { scrollCurrentTabToTop(); },
+      "fab_top_pos"
+    );
+
+    /* Restaurar última pestaña visitada */
+    const initialTab = Number(readStorageItem("active_tab", "0")) || 0;
+    go(initialTab);
+
+    /* Barra de progreso al hacer scroll */
+    window.addEventListener("scroll", updateReadingProgressBar, { passive: true });
+
+    /* Comprobación periódica que repara cualquier contenedor SVG vacío */
+    setInterval(repairVisibleEmptySvgContainers, 2200);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeTutorialApp);
+  } else {
+    initializeTutorialApp();
+  }
+})();
+</script>
+</body>
+</html>
